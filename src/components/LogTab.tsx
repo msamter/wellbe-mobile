@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import {
   ChevronDown,
   ChevronUp,
@@ -14,7 +15,15 @@ import {
 import { AppSettings, MoodBucket, MoodEntry } from '../types/wellbe';
 import { MOOD_BUCKETS, toLocalDateKey } from '../data/wellbeData';
 import { AffectiveGlyph, getQuadrantStyle } from './AffectiveGlyphs';
+import { getEmotionPersonalGlow } from './CompactEmotionMatrix';
 import { downloadFile, entriesToCsv } from '../utils/analytics';
+import { useAccessibility } from '../context/AccessibilityContext';
+import { getM3Spring, m3Shapes } from '../design/m3ExpressiveTokens';
+import {
+  ExpressiveButton,
+  ExpressiveChip,
+  ExpressiveIconButton,
+} from './ExpressiveControls';
 
 interface LogTabProps {
   isActive?: boolean;
@@ -34,6 +43,13 @@ const FILTER_OPTIONS: Array<{ id: 'all' | MoodBucket; label: string; shortLabel:
 
 const LONG_NOTE_THRESHOLD = 78;
 const INLINE_UNDO_DURATION_MS = 3000;
+const LOG_SPOTLIGHT_START_DELAY_MS = 90;
+const LOG_SPOTLIGHT_FONT_DELAY_MS = 280;
+const LOG_SPOTLIGHT_FONT_FALLBACK_MS = 680;
+const LOG_SPOTLIGHT_GLOW_DURATION_MS = 4200;
+const LOG_SPOTLIGHT_REDUCED_DURATION_MS = 2400;
+const MAX_INITIAL_WAVE_ROWS = 14;
+const WAVE_ROW_STEP_SEC = 0.04;
 
 const LOG_TIME_FMT = new Intl.DateTimeFormat('en-US', {
   hour: 'numeric',
@@ -51,9 +67,19 @@ const LOG_DAY_FMT = new Intl.DateTimeFormat('en-US', {
 
 interface MoodLogRowProps {
   entry: MoodEntry;
+  rowOrderIdx: number;
+  waveRunId: number;
+  rowRadiusClass?: string;
   showQuadrantLabel: boolean;
   isNoteExpanded: boolean;
   isPendingDelete: boolean;
+  isSpotlightActive?: boolean;
+  spotlightFontPhase?: 'idle' | 'a' | 'b';
+  spotlightFontBreathing?: boolean;
+  spotlightRadiusClass?: string;
+  onSpotlightFontEnd?: () => void;
+  reduceMotion?: boolean;
+  calmMode?: boolean;
   readingComfort: boolean;
   plainLanguage: boolean;
   onToggleExpandNote: (id: string) => void;
@@ -64,20 +90,39 @@ interface MoodLogRowProps {
 const MoodLogRow: React.FC<MoodLogRowProps> = React.memo(
   ({
     entry,
+    rowOrderIdx,
+    waveRunId,
+    rowRadiusClass = 'rounded-2xl',
     showQuadrantLabel,
     isNoteExpanded,
     isPendingDelete,
+    isSpotlightActive = false,
+    spotlightFontPhase = 'idle',
+    spotlightFontBreathing = false,
+    spotlightRadiusClass = 'rounded-2xl',
+    onSpotlightFontEnd,
+    reduceMotion = false,
+    calmMode = false,
     readingComfort,
     plainLanguage,
     onToggleExpandNote,
     onStartPendingDelete,
     onUndoPendingDelete,
   }) => {
+    const [rowHovered, setRowHovered] = useState(false);
     const qStyle = getQuadrantStyle(entry.quadrant);
     const secondaryQStyle =
       entry.isBlended && entry.secondaryQuadrant
         ? getQuadrantStyle(entry.secondaryQuadrant)
         : null;
+    const personalGlow = getEmotionPersonalGlow(entry.emotionId, entry.quadrant);
+    const spotlightGlowBg =
+      entry.isBlended && entry.secondaryEmotionId && entry.secondaryQuadrant
+        ? `linear-gradient(135deg, ${personalGlow} 0%, ${getEmotionPersonalGlow(
+            entry.secondaryEmotionId,
+            entry.secondaryQuadrant
+          )} 100%)`
+        : personalGlow;
     const parsedTs = new Date(entry.timestamp);
     const timeStr = Number.isNaN(parsedTs.getTime()) ? '' : LOG_TIME_FMT.format(parsedTs);
     const trimmedNote = entry.note.trim();
@@ -85,23 +130,118 @@ const MoodLogRow: React.FC<MoodLogRowProps> = React.memo(
     const isLongNote = trimmedNote.length > LONG_NOTE_THRESHOLD;
     const cleanTags = entry.tags.filter((t) => t.trim().length > 0);
 
+    const isInInitialWave = rowOrderIdx < MAX_INITIAL_WAVE_ROWS;
+    const waveDelay = isInInitialWave ? rowOrderIdx * WAVE_ROW_STEP_SEC : 0;
+    const waveAmplitudeY = calmMode ? 10 : 20;
+    const waveStartScale = calmMode ? 0.985 : 0.962;
+
+    const rowWaveSpring = useMemo(
+      () =>
+        getM3Spring('defaultSpatial', {
+          reduceMotion,
+          calmMode,
+          delay: waveDelay,
+        }),
+      [reduceMotion, calmMode, waveDelay]
+    );
+
+    const glyphHoverSpring = useMemo(
+      () => getM3Spring('fastSpatial', { reduceMotion, calmMode }),
+      [reduceMotion, calmMode]
+    );
+
     return (
-      <article
+      <motion.article
         data-pending-delete={isPendingDelete ? 'true' : 'false'}
-        className="wb-log-row flex items-center justify-between gap-2.5 px-3.5 py-2.5 transition-colors hover:bg-[var(--surface-hover)]/45 sm:px-4 sm:py-3"
+        data-spotlight={isSpotlightActive ? 'active' : 'idle'}
+        initial={
+          reduceMotion
+            ? false
+            : {
+                opacity: 0,
+                y: waveAmplitudeY,
+                scale: waveStartScale,
+              }
+        }
+        animate={
+          isInInitialWave || reduceMotion
+            ? { opacity: 1, y: 0, scale: 1 }
+            : undefined
+        }
+        whileInView={
+          !isInInitialWave && !reduceMotion
+            ? { opacity: 1, y: 0, scale: 1 }
+            : undefined
+        }
+        viewport={
+          !isInInitialWave && !reduceMotion
+            ? { once: true, amount: 0.15 }
+            : undefined
+        }
+        transition={rowWaveSpring}
+        onMouseEnter={() => setRowHovered(true)}
+        onMouseLeave={() => setRowHovered(false)}
+        className={`wb-log-row relative flex items-center justify-between gap-2.5 px-3.5 py-2.5 transition-colors hover:bg-[var(--surface-hover)]/45 sm:px-4 sm:py-3 ${
+          isSpotlightActive ? `wb-log-latest-spotlight ${spotlightRadiusClass}` : rowRadiusClass
+        }`}
+        style={
+          isSpotlightActive
+            ? ({
+                '--log-spotlight-border': qStyle.solid,
+                '--log-spotlight-glow': spotlightGlowBg,
+              } as React.CSSProperties)
+            : undefined
+        }
       >
+        {/* Material 3 Expressive Top-to-Bottom Tonal Wave Sheen (sweeps softly across each row in cascade order) */}
+        {!reduceMotion && isInInitialWave && (
+          <span
+            key={`wave-sheen-${waveRunId}`}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+            style={{ borderRadius: 'inherit' }}
+          >
+            <motion.span
+              initial={{ x: '-115%', opacity: 0 }}
+              animate={{ x: '115%', opacity: [0, calmMode ? 0.12 : 0.22, 0] }}
+              transition={{
+                duration: calmMode ? 0.62 : 0.56,
+                delay: waveDelay + 0.04,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="absolute inset-y-0 left-0 w-3/4"
+              style={{
+                background: `linear-gradient(90deg, transparent 0%, color-mix(in srgb, ${personalGlow} 42%, transparent) 50%, transparent 100%)`,
+              }}
+            />
+          </span>
+        )}
+
         <div
-          className={`flex min-w-0 flex-1 items-start gap-2.5 transition-opacity duration-150 sm:gap-3 ${
+          className={`relative z-[1] flex min-w-0 flex-1 items-start gap-2.5 transition-opacity duration-150 sm:gap-3 ${
             isPendingDelete ? 'opacity-50' : 'opacity-100'
           }`}
         >
-          {/* RULER Quadrant Icon Box */}
-          <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-9 sm:w-9 sm:rounded-xl"
+          {/* RULER Quadrant Icon Box with M3 Expressive squircle morph on hover */}
+          <motion.div
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                    scale: rowHovered ? 1.07 : 1,
+                    borderRadius: rowHovered ? m3Shapes.pill : '12px',
+                  }
+            }
+            transition={glyphHoverSpring}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl sm:h-9 sm:w-9"
             style={{
               backgroundColor: qStyle.bg,
               color: qStyle.fg,
-              border: `1px solid ${qStyle.border}`,
+              border: `1px solid ${isSpotlightActive || rowHovered ? qStyle.solid : qStyle.border}`,
+              boxShadow:
+                (isSpotlightActive || rowHovered) && !reduceMotion
+                  ? `0 0 10px -2px color-mix(in srgb, ${personalGlow} 52%, transparent)`
+                  : undefined,
             }}
           >
             <AffectiveGlyph
@@ -109,17 +249,41 @@ const MoodLogRow: React.FC<MoodLogRowProps> = React.memo(
               quadrant={entry.quadrant}
               size={16}
             />
-          </div>
+          </motion.div>
 
           <div className="min-w-0 flex-1 space-y-0.5">
             {/* Single-Line Inline Header: Emotion · Quadrant · Time */}
             <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 leading-snug">
               <h3
-                className={`text-sm font-semibold text-[var(--ink-primary)] sm:text-[15px] ${
+                data-quadrant={entry.quadrant}
+                data-bounce-phase={!reduceMotion ? spotlightFontPhase : 'idle'}
+                onAnimationEnd={(e) => {
+                  if (e.target === e.currentTarget && spotlightFontPhase !== 'idle') {
+                    onSpotlightFontEnd?.();
+                  }
+                }}
+                className={`wb-latest-emotion-label wb-log-spotlight-label text-sm font-semibold text-[var(--ink-primary)] sm:text-[15px] ${
                   isPendingDelete ? 'line-through decoration-[var(--ink-muted)]' : ''
                 }`}
+                style={
+                  {
+                    '--wb-latest-peak-scale': '1.14',
+                    color: isSpotlightActive ? qStyle.fg : undefined,
+                  } as React.CSSProperties
+                }
               >
-                {entry.emotionLabel}
+                <span
+                  data-breathing={
+                    !reduceMotion &&
+                    spotlightFontBreathing &&
+                    spotlightFontPhase === 'idle'
+                      ? 'active'
+                      : 'paused'
+                  }
+                  className="wb-latest-emotion-text wb-log-spotlight-text"
+                >
+                  {entry.emotionLabel}
+                </span>
               </h3>
               {showQuadrantLabel && (
                 <>
@@ -215,31 +379,67 @@ const MoodLogRow: React.FC<MoodLogRowProps> = React.memo(
         </div>
 
         {isPendingDelete ? (
-          <button
-            type="button"
-            data-no-drag-scroll="true"
-            onClick={() => onUndoPendingDelete(entry)}
-            className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-1.5 rounded-xl border border-[var(--brand-accent-border)] bg-[var(--brand-accent-soft)] px-2.5 text-xs font-semibold text-[var(--brand-accent-text)] transition-colors hover:opacity-90"
-            aria-label={`Undo delete for ${entry.emotionLabel} entry at ${timeStr}`}
-            title="Undo delete"
-          >
-            <Undo2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-            {plainLanguage && <span>Undo</span>}
-          </button>
-        ) : (
-          <button
-            type="button"
+          plainLanguage ? (
+            <ExpressiveButton
+              variant="tonal"
+              size="md"
+              selected
+              data-no-drag-scroll="true"
+              onClick={() => onUndoPendingDelete(entry)}
+              leadingIcon={<Undo2 className="h-4 w-4 shrink-0" aria-hidden="true" />}
+              aria-label={`Undo delete for ${entry.emotionLabel} entry at ${timeStr}`}
+              title="Undo delete"
+              className="relative z-[1]"
+            >
+              Undo
+            </ExpressiveButton>
+          ) : (
+            <ExpressiveIconButton
+              variant="filled"
+              toggled
+              size={44}
+              data-no-drag-scroll="true"
+              onClick={() => onUndoPendingDelete(entry)}
+              ariaLabel={`Undo delete for ${entry.emotionLabel} entry at ${timeStr}`}
+              title="Undo delete"
+              className="relative z-[1]"
+              style={{
+                backgroundColor: 'var(--brand-accent-soft)',
+                color: 'var(--brand-accent-text)',
+                border: '1px solid var(--brand-accent-border)',
+              }}
+            >
+              <Undo2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+            </ExpressiveIconButton>
+          )
+        ) : plainLanguage ? (
+          <ExpressiveButton
+            variant="text"
+            size="md"
             data-no-drag-scroll="true"
             onClick={() => onStartPendingDelete(entry)}
-            className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-1.5 rounded-xl px-2 text-xs font-semibold text-[var(--ink-muted)] transition-colors hover:bg-[var(--q-red-bg)] hover:text-[var(--q-red-fg)]"
+            leadingIcon={<Trash2 className="h-4 w-4 shrink-0" aria-hidden="true" />}
             aria-label={`Delete ${entry.emotionLabel} entry at ${timeStr}`}
             title="Delete entry"
+            className="relative z-[1] text-[var(--ink-muted)] hover:bg-[var(--q-red-bg)] hover:text-[var(--q-red-fg)]"
+            style={{ color: 'var(--ink-muted)' }}
+          >
+            Delete
+          </ExpressiveButton>
+        ) : (
+          <ExpressiveIconButton
+            variant="standard"
+            size={44}
+            data-no-drag-scroll="true"
+            onClick={() => onStartPendingDelete(entry)}
+            ariaLabel={`Delete ${entry.emotionLabel} entry at ${timeStr}`}
+            title="Delete entry"
+            className="relative z-[1] hover:bg-[var(--q-red-bg)] hover:text-[var(--q-red-fg)]"
           >
             <Trash2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-            {plainLanguage && <span>Delete</span>}
-          </button>
+          </ExpressiveIconButton>
         )}
-      </article>
+      </motion.article>
     );
   }
 );
@@ -256,6 +456,10 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
     onOpenQuickCheckIn,
     onNotify,
   }) => {
+    const osReduced = useReducedMotion();
+    const { calmMode, reduceMotion: a11yReduceMotion } = useAccessibility();
+    const effectiveReduceMotion = Boolean(osReduced || settings.reduceMotion || a11yReduceMotion);
+
     const [activeBucket, setActiveBucket] = useState<'all' | MoodBucket>('all');
     const [focusedFilterIdx, setFocusedFilterIdx] = useState(0);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -263,7 +467,14 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
     const [expandedNoteIds, setExpandedNoteIds] = useState<Set<string>>(() => new Set());
     const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(() => new Set());
     const [liveAnnouncement, setLiveAnnouncement] = useState('');
-    const [staggerActive, setStaggerActive] = useState(true);
+    const [waveRunId, setWaveRunId] = useState(0);
+    const [spotlight, setSpotlight] = useState<{
+      entryId: string;
+      fontPhase: 'idle' | 'a' | 'b';
+      fontBreathing: boolean;
+    } | null>(null);
+    const prevIsActiveRef = useRef(isActive);
+    const prevBucketRef = useRef(activeBucket);
     const menuRef = useRef<HTMLDivElement>(null);
     const menuTriggerRef = useRef<HTMLButtonElement>(null);
     const filterBtnRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -273,6 +484,54 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
     const onDeleteEntryRef = useRef(onDeleteEntry);
     onDeleteEntryRef.current = onDeleteEntry;
     const announceSeqRef = useRef(0);
+    // Tracks every entry ID the user has already seen while viewing Mood Log so the spotlight
+    // fires strictly the first time you visit Log and see your most recently logged emotion.
+    const seenOnLogIdsRef = useRef<Set<string>>(new Set());
+    const spotlightStartTimerRef = useRef<number | null>(null);
+    const spotlightFontDelayTimerRef = useRef<number | null>(null);
+    const spotlightFontEndTimerRef = useRef<number | null>(null);
+    const spotlightGlowEndTimerRef = useRef<number | null>(null);
+
+    // Re-trigger the M3 Expressive top-to-bottom wave whenever entering the Mood Log tab or switching filter buckets
+    useEffect(() => {
+      const becameActive = isActive && !prevIsActiveRef.current;
+      const bucketChanged = activeBucket !== prevBucketRef.current;
+      prevIsActiveRef.current = isActive;
+      prevBucketRef.current = activeBucket;
+
+      if ((becameActive || (isActive && bucketChanged)) && !effectiveReduceMotion) {
+        setWaveRunId((n) => n + 1);
+      }
+    }, [isActive, activeBucket, effectiveReduceMotion]);
+
+    const clearSpotlightTimers = useCallback(() => {
+      if (spotlightStartTimerRef.current !== null) {
+        window.clearTimeout(spotlightStartTimerRef.current);
+        spotlightStartTimerRef.current = null;
+      }
+      if (spotlightFontDelayTimerRef.current !== null) {
+        window.clearTimeout(spotlightFontDelayTimerRef.current);
+        spotlightFontDelayTimerRef.current = null;
+      }
+      if (spotlightFontEndTimerRef.current !== null) {
+        window.clearTimeout(spotlightFontEndTimerRef.current);
+        spotlightFontEndTimerRef.current = null;
+      }
+      if (spotlightGlowEndTimerRef.current !== null) {
+        window.clearTimeout(spotlightGlowEndTimerRef.current);
+        spotlightGlowEndTimerRef.current = null;
+      }
+    }, []);
+
+    const handleSpotlightFontEnd = useCallback(() => {
+      if (spotlightFontEndTimerRef.current !== null) {
+        window.clearTimeout(spotlightFontEndTimerRef.current);
+        spotlightFontEndTimerRef.current = null;
+      }
+      setSpotlight((curr) =>
+        curr ? { ...curr, fontPhase: 'idle', fontBreathing: true } : null
+      );
+    }, []);
 
     const announcePolite = useCallback((message: string) => {
       announceSeqRef.current += 1;
@@ -344,19 +603,20 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
     );
 
     useEffect(() => {
-      const t = window.setTimeout(() => setStaggerActive(false), 280);
       return () => {
-        window.clearTimeout(t);
         cancelAllPendingTimers();
+        clearSpotlightTimers();
       };
-    }, [cancelAllPendingTimers]);
+    }, [cancelAllPendingTimers, clearSpotlightTimers]);
 
-    // Close open Export & Data dropdown and flush/cancel any active per-row delete timers
+    // Close open Export & Data dropdown, clear any active first-visit spotlight, and flush/cancel per-row delete timers
     // when leaving the kept-mounted Mood Log tab so timers never fire off-tab
     useEffect(() => {
       if (!isActive) {
         setMenuOpen(false);
         setConfirmClear(false);
+        clearSpotlightTimers();
+        setSpotlight(null);
         const idsToCommit = Array.from(pendingDeleteIdsRef.current);
         cancelAllPendingTimers();
         if (idsToCommit.length > 0) {
@@ -364,7 +624,7 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
           idsToCommit.forEach((id) => onDeleteEntryRef.current(id));
         }
       }
-    }, [isActive, cancelAllPendingTimers]);
+    }, [isActive, cancelAllPendingTimers, clearSpotlightTimers]);
 
     // Pointer-outside & Escape handler with clean focus return for Export & Data menu
     useEffect(() => {
@@ -447,6 +707,98 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
       return entries.filter((e) => e.bucket === activeBucket);
     }, [entries, activeBucket]);
 
+    // Trigger emotion-colored outline glow + sequential Quick Check-In quadrant font animation
+    // strictly the first time the user visits Mood Log and sees their most recently logged emotion.
+    useEffect(() => {
+      if (!isActive || entries.length === 0) return;
+
+      const latest = entries[0];
+      const isLatestVisible =
+        filteredEntries.length > 0 && filteredEntries[0].id === latest.id;
+
+      if (!isLatestVisible) {
+        // Record non-latest visible entries as seen so deleting them never triggers false spotlights,
+        // while keeping the unseen latest entry eligible once the user views it.
+        filteredEntries.forEach((e) => {
+          if (e.id !== latest.id) seenOnLogIdsRef.current.add(e.id);
+        });
+        return;
+      }
+
+      if (seenOnLogIdsRef.current.has(latest.id)) {
+        entries.forEach((e) => seenOnLogIdsRef.current.add(e.id));
+        return;
+      }
+
+      // Mark all current entries as seen so revisiting Log or deleting top entry won't replay
+      entries.forEach((e) => seenOnLogIdsRef.current.add(e.id));
+
+      clearSpotlightTimers();
+      const targetId = latest.id;
+      const prefersReducedMotion =
+        settings.reduceMotion ||
+        (typeof window !== 'undefined' &&
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+      if (prefersReducedMotion) {
+        setSpotlight({ entryId: targetId, fontPhase: 'idle', fontBreathing: false });
+        spotlightGlowEndTimerRef.current = window.setTimeout(() => {
+          spotlightGlowEndTimerRef.current = null;
+          setSpotlight((curr) => (curr?.entryId === targetId ? null : curr));
+        }, LOG_SPOTLIGHT_REDUCED_DURATION_MS);
+        return;
+      }
+
+      // Stage 1: Outline glow blooms in the emotion's color
+      spotlightStartTimerRef.current = window.setTimeout(() => {
+        spotlightStartTimerRef.current = null;
+        setSpotlight({ entryId: targetId, fontPhase: 'idle', fontBreathing: false });
+
+        // Stage 2: Then animate the emotion font in the exact Quick Check-In quadrant style
+        spotlightFontDelayTimerRef.current = window.setTimeout(() => {
+          spotlightFontDelayTimerRef.current = null;
+          setSpotlight((curr) =>
+            curr?.entryId === targetId
+              ? { ...curr, fontPhase: 'a', fontBreathing: false }
+              : curr
+          );
+
+          // Safety fallback if animationend doesn't fire (e.g. backgrounded tab)
+          spotlightFontEndTimerRef.current = window.setTimeout(() => {
+            spotlightFontEndTimerRef.current = null;
+            setSpotlight((curr) =>
+              curr?.entryId === targetId
+                ? { ...curr, fontPhase: 'idle', fontBreathing: true }
+                : curr
+            );
+          }, LOG_SPOTLIGHT_FONT_FALLBACK_MS);
+        }, LOG_SPOTLIGHT_FONT_DELAY_MS);
+
+        // Settle cleanly after the outline glow completes
+        spotlightGlowEndTimerRef.current = window.setTimeout(() => {
+          spotlightGlowEndTimerRef.current = null;
+          setSpotlight((curr) => (curr?.entryId === targetId ? null : curr));
+        }, LOG_SPOTLIGHT_GLOW_DURATION_MS);
+      }, LOG_SPOTLIGHT_START_DELAY_MS);
+    }, [isActive, entries, filteredEntries, settings.reduceMotion, clearSpotlightTimers]);
+
+    // Halt active font animation immediately if Reduce Motion turns on mid-spotlight
+    useEffect(() => {
+      if (!settings.reduceMotion) return;
+      if (spotlightFontDelayTimerRef.current !== null) {
+        window.clearTimeout(spotlightFontDelayTimerRef.current);
+        spotlightFontDelayTimerRef.current = null;
+      }
+      if (spotlightFontEndTimerRef.current !== null) {
+        window.clearTimeout(spotlightFontEndTimerRef.current);
+        spotlightFontEndTimerRef.current = null;
+      }
+      setSpotlight((curr) =>
+        curr ? { ...curr, fontPhase: 'idle', fontBreathing: false } : null
+      );
+    }, [settings.reduceMotion]);
+
     const groupedByDay = useMemo(() => {
       const map = new Map<string, MoodEntry[]>();
       filteredEntries.forEach((entry) => {
@@ -455,6 +807,7 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
         map.set(entry.dateKey, list);
       });
       const todayKey = toLocalDateKey(new Date());
+      let runningRowIdx = 0;
       return Array.from(map.entries()).map(([dateKey, dayEntries]) => {
         const parts = dateKey.split('-').map(Number);
         const validParts = parts.length === 3 && parts.every(Number.isFinite);
@@ -465,7 +818,9 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
           : dateKey === todayKey
             ? `Today · ${LOG_TODAY_FMT.format(dt)}`
             : LOG_DAY_FMT.format(dt);
-        return { dateKey, label, entries: dayEntries };
+        const startRowIdx = runningRowIdx;
+        runningRowIdx += dayEntries.length;
+        return { dateKey, label, entries: dayEntries, startRowIdx };
       });
     }, [filteredEntries]);
 
@@ -548,9 +903,11 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
             </div>
 
             <div className="relative shrink-0" ref={menuRef}>
-              <button
+              <ExpressiveButton
                 ref={menuTriggerRef}
-                type="button"
+                variant="outlined"
+                size="md"
+                selected={menuOpen}
                 onClick={() => {
                   setMenuOpen((o) => !o);
                   setConfirmClear(false);
@@ -558,12 +915,11 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
                 aria-expanded={menuOpen}
                 aria-haspopup="menu"
                 aria-label="Export and manage local log data"
-                className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-card)] px-3 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)] sm:px-3.5 sm:text-sm"
+                leadingIcon={<Download className="h-3.5 w-3.5 shrink-0 text-[var(--ink-muted)] sm:h-4 sm:w-4" />}
+                trailingIcon={<MoreHorizontal className="h-3.5 w-3.5 shrink-0 text-[var(--ink-muted)] sm:h-4 sm:w-4" />}
               >
-                <Download className="h-3.5 w-3.5 shrink-0 text-[var(--ink-muted)] sm:h-4 sm:w-4" />
-                <span>Export &amp; Data</span>
-                <MoreHorizontal className="h-3.5 w-3.5 shrink-0 text-[var(--ink-muted)] sm:h-4 sm:w-4" />
-              </button>
+                Export &amp; Data
+              </ExpressiveButton>
 
               {menuOpen && (
                 <div
@@ -665,23 +1021,35 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
               const qStyle = bucketDef ? getQuadrantStyle(bucketDef.quadrant) : null;
               const count = bucketCounts[opt.id] ?? 0;
               return (
-                <button
+                <ExpressiveChip
                   key={opt.id}
                   ref={(el) => {
                     filterBtnRefs.current[idx] = el;
                   }}
-                  type="button"
+                  label={opt.shortLabel}
+                  count={count}
+                  selected={active}
+                  showCheckOnSelect={!bucketDef}
+                  icon={
+                    bucketDef && qStyle ? (
+                      <span style={{ color: qStyle.solid }}>
+                        <AffectiveGlyph
+                          bucket={bucketDef.id}
+                          quadrant={bucketDef.quadrant}
+                          size={12}
+                        />
+                      </span>
+                    ) : undefined
+                  }
                   tabIndex={focusedFilterIdx === idx ? 0 : -1}
                   onClick={() => {
                     setActiveBucket(opt.id);
                     setFocusedFilterIdx(idx);
                   }}
                   onKeyDown={(e) => handleFilterKeyDown(e, idx)}
-                  aria-pressed={active}
                   aria-label={`${opt.label} (${count})`}
                   title={`${opt.label} (${count})`}
-                  className="inline-flex min-h-[30px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors tabular-nums"
-                  style={
+                  toneStyle={
                     opt.id === 'all'
                       ? {
                           backgroundColor: active
@@ -698,19 +1066,7 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
                           border: `1px solid ${active && qStyle ? qStyle.solid : 'var(--border-hairline)'}`,
                         }
                   }
-                >
-                  {bucketDef && qStyle && (
-                    <span style={{ color: qStyle.solid }}>
-                      <AffectiveGlyph
-                        bucket={bucketDef.id}
-                        quadrant={bucketDef.quadrant}
-                        size={12}
-                      />
-                    </span>
-                  )}
-                  <span>{opt.shortLabel}</span>
-                  {count > 0 && <span className="opacity-70">{count}</span>}
-                </button>
+                />
               );
             })}
           </div>
@@ -731,8 +1087,10 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
                 ? 'Log your first emotional check-in to start building local trend insights.'
                 : 'Try switching back to All to inspect your full timeline.'}
             </p>
-            <button
-              type="button"
+            <ExpressiveButton
+              variant="filled"
+              size="md"
+              className="mt-3.5"
               onClick={
                 entries.length === 0
                   ? onOpenQuickCheckIn
@@ -741,55 +1099,121 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
                       setFocusedFilterIdx(0);
                     }
               }
-              className="mt-3.5 inline-flex min-h-[40px] items-center rounded-xl px-4 text-xs font-semibold"
-              style={{
-                backgroundColor: 'var(--accent-primary)',
-                color: 'var(--accent-primary-ink)',
-              }}
             >
               {entries.length === 0 ? 'Log First Check-In' : 'Show All Check-Ins'}
-            </button>
+            </ExpressiveButton>
           </section>
         ) : (
-          <div className="space-y-3">
-            {groupedByDay.map((group, groupIdx) => (
-              <section
-                key={group.dateKey}
-                data-edge-recede=""
-                data-stagger={staggerActive && groupIdx < 4 ? groupIdx : undefined}
-                aria-label={`Logs for ${group.label}`}
-                className={staggerActive && groupIdx < 4 ? 'wb-stagger-card' : undefined}
-              >
-                <div className="mb-1.5 flex items-baseline justify-between px-1">
-                  <h2 className="text-xs font-semibold tracking-tight text-[var(--ink-primary)] sm:text-sm">
-                    {group.label}
-                  </h2>
-                  <span className="text-[11px] font-normal text-[var(--ink-muted)] tabular-nums sm:text-xs">
-                    {group.entries.length}{' '}
-                    {group.entries.length === 1 ? 'entry' : 'entries'}
-                  </span>
-                </div>
+          <div key={`log-wave-${waveRunId}`} className="space-y-3">
+            {groupedByDay.map((group) => {
+              const groupDelay = Math.min(group.startRowIdx, 10) * WAVE_ROW_STEP_SEC;
+              const groupSpring = getM3Spring('defaultSpatial', {
+                reduceMotion: effectiveReduceMotion,
+                calmMode,
+                delay: groupDelay,
+              });
+              const isGroupAboveFold = group.startRowIdx < MAX_INITIAL_WAVE_ROWS;
 
-                <div className="wb-surface divide-y divide-[var(--border-hairline)] rounded-2xl">
-                  {group.entries.map((entry) => (
-                    <MoodLogRow
-                      key={entry.id}
-                      entry={entry}
-                      showQuadrantLabel={
-                        activeBucket === 'all' || Boolean(entry.isBlended) || settings.patternAssist
-                      }
-                      isNoteExpanded={expandedNoteIds.has(entry.id)}
-                      isPendingDelete={pendingDeleteIds.has(entry.id)}
-                      readingComfort={settings.readingComfort}
-                      plainLanguage={settings.plainLanguage}
-                      onToggleExpandNote={toggleExpandNote}
-                      onStartPendingDelete={handleStartPendingDelete}
-                      onUndoPendingDelete={handleUndoPendingDelete}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
+              return (
+                <section
+                  key={group.dateKey}
+                  data-edge-recede=""
+                  aria-label={`Logs for ${group.label}`}
+                >
+                  <motion.div
+                    initial={
+                      effectiveReduceMotion
+                        ? false
+                        : {
+                            opacity: 0,
+                            y: calmMode ? 8 : 14,
+                            scale: calmMode ? 0.992 : 0.982,
+                          }
+                    }
+                    animate={
+                      isGroupAboveFold || effectiveReduceMotion
+                        ? { opacity: 1, y: 0, scale: 1 }
+                        : undefined
+                    }
+                    whileInView={
+                      !isGroupAboveFold && !effectiveReduceMotion
+                        ? { opacity: 1, y: 0, scale: 1 }
+                        : undefined
+                    }
+                    viewport={
+                      !isGroupAboveFold && !effectiveReduceMotion
+                        ? { once: true, amount: 0.08 }
+                        : undefined
+                    }
+                    transition={groupSpring}
+                  >
+                    <div className="mb-1.5 flex items-baseline justify-between px-1">
+                      <h2 className="text-xs font-semibold tracking-tight text-[var(--ink-primary)] sm:text-sm">
+                        {group.label}
+                      </h2>
+                      <span className="text-[11px] font-normal text-[var(--ink-muted)] tabular-nums sm:text-xs">
+                        {group.entries.length}{' '}
+                        {group.entries.length === 1 ? 'entry' : 'entries'}
+                      </span>
+                    </div>
+
+                    <div className="wb-surface divide-y divide-[var(--border-hairline)] rounded-2xl">
+                      {group.entries.map((entry, entryIdx) => {
+                        const rowOrderIdx = group.startRowIdx + entryIdx;
+                        const isRowSpotlight = spotlight?.entryId === entry.id;
+                        const rowRadiusClass =
+                          group.entries.length === 1
+                            ? 'rounded-2xl'
+                            : entryIdx === 0
+                              ? 'rounded-t-2xl'
+                              : entryIdx === group.entries.length - 1
+                                ? 'rounded-b-2xl'
+                                : '';
+                        const spotlightRadiusClass =
+                          group.entries.length === 1
+                            ? 'rounded-2xl'
+                            : entryIdx === 0
+                              ? 'rounded-t-2xl rounded-b-xl'
+                              : entryIdx === group.entries.length - 1
+                                ? 'rounded-t-xl rounded-b-2xl'
+                                : 'rounded-xl';
+
+                        return (
+                          <MoodLogRow
+                            key={entry.id}
+                            entry={entry}
+                            rowOrderIdx={rowOrderIdx}
+                            waveRunId={waveRunId}
+                            rowRadiusClass={rowRadiusClass}
+                            showQuadrantLabel={
+                              activeBucket === 'all' ||
+                              Boolean(entry.isBlended) ||
+                              settings.patternAssist
+                            }
+                            isNoteExpanded={expandedNoteIds.has(entry.id)}
+                            isPendingDelete={pendingDeleteIds.has(entry.id)}
+                            isSpotlightActive={isRowSpotlight}
+                            spotlightFontPhase={isRowSpotlight ? spotlight.fontPhase : 'idle'}
+                            spotlightFontBreathing={
+                              isRowSpotlight ? spotlight.fontBreathing : false
+                            }
+                            spotlightRadiusClass={spotlightRadiusClass}
+                            onSpotlightFontEnd={handleSpotlightFontEnd}
+                            reduceMotion={effectiveReduceMotion}
+                            calmMode={calmMode}
+                            readingComfort={settings.readingComfort}
+                            plainLanguage={settings.plainLanguage}
+                            onToggleExpandNote={toggleExpandNote}
+                            onStartPendingDelete={handleStartPendingDelete}
+                            onUndoPendingDelete={handleUndoPendingDelete}
+                          />
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                </section>
+              );
+            })}
           </div>
         )}
       </div>

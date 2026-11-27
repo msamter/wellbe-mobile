@@ -51,6 +51,8 @@ import {
 import { TodayTab, type QuickLogResult } from './components/TodayTab';
 import type { SettingsTabId } from './components/SettingsModal';
 import { ExpandingCapsuleDock } from './components/ExpandingCapsuleDock';
+import { ExpressiveTabSkeleton } from './components/ExpressiveLoaders';
+import { ExpressiveButton, ExpressiveIconButton } from './components/ExpressiveControls';
 
 const RoutinesTab = lazy(() =>
   import('./components/RoutinesTab').then((m) => ({ default: m.RoutinesTab }))
@@ -1354,31 +1356,50 @@ export default function App() {
             WELLBE+
           </button>
 
-          {/* Right Utility Control: Sleek Settings Trigger (Account, Wearables, Accessibility, Support & About) */}
+          {/* Right Utility Control: M3 Expressive Settings Trigger (Pill -> 14px Squircle when open) */}
           <div className="flex shrink-0 items-center justify-end">
-            <button
-              type="button"
-              onClick={() => {
-                setQuickSheetOpen(false);
-                setHandoffNoteOpen(false);
-                setSettingsTab((curr) => (curr ? null : 'account'));
-              }}
-              aria-expanded={Boolean(settingsTab)}
-              aria-label={
-                settingsTab
-                  ? 'Close Settings'
-                  : 'Open Settings (Account, Devices, Accessibility, Support, Legal & About)'
-              }
-              title={settingsTab ? 'Close Settings' : 'Settings'}
-              className={`inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border px-2.5 text-xs font-semibold transition-colors ${
-                settingsTab
-                  ? 'border-[var(--border-strong)] bg-[var(--surface-hover)] text-[var(--ink-primary)]'
-                  : 'border-[var(--border-hairline)] bg-[var(--surface-card)] text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]'
-              }`}
-            >
-              <Settings className="h-4 w-4 shrink-0" />
-              {a11y.plainLanguage && <span>Settings</span>}
-            </button>
+            {a11y.plainLanguage ? (
+              <ExpressiveButton
+                variant="outlined"
+                size="md"
+                selected={Boolean(settingsTab)}
+                onClick={() => {
+                  setQuickSheetOpen(false);
+                  setHandoffNoteOpen(false);
+                  setSettingsTab((curr) => (curr ? null : 'account'));
+                }}
+                aria-expanded={Boolean(settingsTab)}
+                aria-label={
+                  settingsTab
+                    ? 'Close Settings'
+                    : 'Open Settings (Account, Devices, Accessibility, Support, Legal & About)'
+                }
+                title={settingsTab ? 'Close Settings' : 'Settings'}
+                leadingIcon={<Settings className="h-4 w-4 shrink-0" />}
+              >
+                Settings
+              </ExpressiveButton>
+            ) : (
+              <ExpressiveIconButton
+                variant="outlined"
+                toggled={Boolean(settingsTab)}
+                size={44}
+                onClick={() => {
+                  setQuickSheetOpen(false);
+                  setHandoffNoteOpen(false);
+                  setSettingsTab((curr) => (curr ? null : 'account'));
+                }}
+                aria-expanded={Boolean(settingsTab)}
+                ariaLabel={
+                  settingsTab
+                    ? 'Close Settings'
+                    : 'Open Settings (Account, Devices, Accessibility, Support, Legal & About)'
+                }
+                title={settingsTab ? 'Close Settings' : 'Settings'}
+              >
+                <Settings className="h-4 w-4 shrink-0" />
+              </ExpressiveIconButton>
+            )}
           </div>
         </div>
       </header>
@@ -1435,7 +1456,7 @@ export default function App() {
               aria-hidden={activeTab !== 'routines' || undefined}
               className={activeTab !== 'routines' ? 'pointer-events-none' : undefined}
             >
-              <Suspense fallback={null}>
+              <Suspense fallback={<ExpressiveTabSkeleton variant="routines" />}>
                 <RoutinesTab
                   routines={routines}
                   entries={entries}
@@ -1465,7 +1486,7 @@ export default function App() {
               aria-hidden={activeTab !== 'log' || undefined}
               className={activeTab !== 'log' ? 'pointer-events-none' : undefined}
             >
-              <Suspense fallback={null}>
+              <Suspense fallback={<ExpressiveTabSkeleton variant="log" />}>
                 <LogTab
                   isActive={activeTab === 'log'}
                   entries={entries}
@@ -1489,7 +1510,7 @@ export default function App() {
               aria-hidden={activeTab !== 'trends' || undefined}
               className={activeTab !== 'trends' ? 'pointer-events-none' : undefined}
             >
-              <Suspense fallback={null}>
+              <Suspense fallback={<ExpressiveTabSkeleton variant="trends" />}>
                 <TrendsTab
                   isActive={activeTab === 'trends'}
                   analytics={analytics}
@@ -1518,7 +1539,7 @@ export default function App() {
                   : 'pointer-events-none'
               }
             >
-              <Suspense fallback={null}>
+              <Suspense fallback={<ExpressiveTabSkeleton variant="coach" />}>
                 <CoachTab
                   isActive={activeTab === 'coach'}
                   messages={coachMessages}
@@ -1552,6 +1573,7 @@ export default function App() {
         plainLanguage={a11y.plainLanguage}
         quickCheckInOpen={quickSheetOpen}
         reduceMotion={a11y.reduceMotion}
+        calmMode={a11y.calmMode}
       />
 
       {/* Non-intrusive Live Toast / Quick Undo Banner (Isolated from App re-renders) */}
@@ -1679,14 +1701,15 @@ export default function App() {
                   Add a quick note for {handoffEntry.emotionLabel}?
                 </h2>
               </div>
-              <button
-                type="button"
-                aria-label="Close handoff prompt"
+              <ExpressiveIconButton
+                variant="standard"
+                size={44}
+                ariaLabel="Close handoff prompt"
                 onClick={handleCloseHandoff}
-                className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl text-[var(--ink-muted)] hover:bg-[var(--surface-hover)]"
+                className="hover:bg-[var(--surface-hover)]"
               >
                 <X className="h-5 w-5" />
-              </button>
+              </ExpressiveIconButton>
             </div>
 
             <form
@@ -1711,23 +1734,24 @@ export default function App() {
                 className="w-full rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] p-3 text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-muted)]"
               />
               <div className="flex flex-wrap justify-end gap-2">
-                <button
-                  type="button"
+                <ExpressiveButton
+                  variant="outlined"
+                  size="md"
                   onClick={handleCloseHandoff}
-                  className="min-h-[44px] rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-4 text-xs font-semibold text-[var(--ink-secondary)]"
                 >
                   Skip
-                </button>
-                <button
+                </ExpressiveButton>
+                <ExpressiveButton
                   type="submit"
-                  className="min-h-[44px] rounded-xl px-4 text-xs font-semibold"
+                  variant="filled"
+                  size="md"
                   style={{
                     backgroundColor: 'var(--brand-action-bg)',
                     color: 'var(--brand-action-fg)',
                   }}
                 >
                   Save Note
-                </button>
+                </ExpressiveButton>
               </div>
             </form>
           </div>

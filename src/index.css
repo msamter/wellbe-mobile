@@ -1986,13 +1986,129 @@ html[data-high-contrast="true"] .wb-latest-emotion-text {
   --wb-latest-breathe-opacity: 0.92;
 }
 
-/* Smooth, brisk full-button fill highlight & reset transitions for 16 emotion tiles */
+/* First-Visit Mood Log Latest Entry Spotlight:
+   1) Emotion-colored outline ring + outer ambient glow halo blooms first
+   2) Then the emotion label animates using the exact Quick Check-In quadrant keyframes */
+@keyframes wb-log-spotlight-halo {
+  0% {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  10% {
+    opacity: var(--log-glow-outer-max, 0.36);
+    transform: scale(1.012);
+  }
+  48% {
+    opacity: var(--log-glow-outer-max, 0.36);
+    transform: scale(1.006);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.996);
+  }
+}
+
+@keyframes wb-log-spotlight-outline {
+  0% {
+    opacity: 0;
+  }
+  9% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.wb-log-latest-spotlight {
+  isolation: isolate;
+  z-index: 2;
+  --log-glow-outer-max: 0.36;
+  --log-glow-blur: 14px;
+  --log-glow-spread: -3px;
+}
+
+.wb-log-latest-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: var(--log-glow-spread);
+  border-radius: inherit;
+  background: var(--log-spotlight-glow);
+  filter: blur(var(--log-glow-blur));
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  will-change: transform, opacity;
+  animation: wb-log-spotlight-halo 4.2s cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+.wb-log-latest-spotlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--log-spotlight-border);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--log-spotlight-border) 28%, transparent),
+    0 0 14px -2px color-mix(in srgb, var(--log-spotlight-border) 58%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  will-change: opacity;
+  animation: wb-log-spotlight-outline 4.2s cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+.wb-log-spotlight-label {
+  justify-content: flex-start;
+  transform-origin: left center;
+  transition: color 360ms ease;
+}
+
+.wb-log-spotlight-text {
+  transform-origin: left center;
+}
+
+.dark .wb-log-latest-spotlight {
+  --log-glow-outer-max: 0.26;
+  --log-glow-blur: 11px;
+  --log-glow-spread: -2px;
+}
+
+html[data-calm-mode="true"] .wb-log-latest-spotlight {
+  --log-glow-outer-max: 0.18;
+  --log-glow-blur: 10px;
+  --log-glow-spread: -2px;
+}
+
+html.dark[data-calm-mode="true"] .wb-log-latest-spotlight {
+  --log-glow-outer-max: 0.16;
+  --log-glow-blur: 9px;
+  --log-glow-spread: -2px;
+}
+
+html[data-high-contrast="true"] .wb-log-latest-spotlight,
+html[data-calm-mode="true"][data-high-contrast="true"] .wb-log-latest-spotlight {
+  --log-glow-outer-max: 0.22;
+  --log-glow-blur: 9px;
+  --log-glow-spread: -2px;
+}
+
+html.dark[data-high-contrast="true"] .wb-log-latest-spotlight,
+html.dark[data-calm-mode="true"][data-high-contrast="true"] .wb-log-latest-spotlight {
+  --log-glow-outer-max: 0.24;
+  --log-glow-blur: 9px;
+  --log-glow-spread: -2px;
+}
+
+/* Smooth, brisk full-button fill highlight & reset transitions for 16 emotion tiles (motion/react owns transform & border-radius) */
 .wb-emotion-tile {
   transition:
-    transform 90ms cubic-bezier(0.2, 0, 0, 1),
     color 180ms cubic-bezier(0.4, 0, 0.2, 1),
     border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
     filter 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2272,35 +2388,42 @@ html[data-reading-comfort="true"] .wb-emotion-blend-part-second {
   border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
 }
 
-/* Pressed Instant Check-In Tile — Subtle Companion Glow (~35% of Latest Emotion Card, synced 8s) */
+/* Pressed Quick & Instant Check-In Tile — Brisk Expressive Personal-Color Bloom + Calm 8s Settle */
 @keyframes emotion-tile-glow-settle {
   0% {
     opacity: 0;
-    transform: scale(0.994);
+    transform: scale(0.96);
   }
-  32% {
+  5% {
     opacity: var(--tile-glow-max);
-    transform: scale(1.006);
+    transform: scale(1.03);
+  }
+  28% {
+    opacity: var(--tile-glow-max);
+    transform: scale(1.012);
   }
   100% {
     opacity: 0;
-    transform: scale(0.998);
+    transform: scale(0.996);
   }
+}
+
+.wb-emotion-tile-cell {
+  contain: layout style;
 }
 
 .wb-emotion-tile {
   contain: layout style;
-  --tile-radius: 10px;
-  --tile-glow-max: 0.16;
-  --tile-glow-blur: 9px;
-  --tile-glow-spread: -2px;
-  border-radius: var(--tile-radius);
+  --tile-glow-max: 0.34;
+  --tile-glow-blur: 12px;
+  --tile-glow-spread: -3px;
   border: 1.5px solid var(--tile-border, var(--border-hairline));
 }
 
 @media (hover: hover) {
   .wb-emotion-tile:hover:not(:disabled) {
     border-color: var(--tile-border-hover, var(--tile-border, var(--border-strong)));
+    box-shadow: var(--tile-hover-glow, none);
   }
 }
 
@@ -2310,16 +2433,16 @@ html[data-reading-comfort="true"] .wb-emotion-blend-part-second {
 
 /* Shared size-independent surface fill + top-edge specular micro-highlight across Quick Check-In & Instant Check-In */
 .wb-emotion-tile-fill {
-  border-radius: calc(var(--tile-radius, 10px) - 1.5px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
 }
 
 .dark .wb-emotion-tile-fill {
-  box-shadow: inset 0 1px 0 rgba(254, 254, 254, 0.11);
+  box-shadow: inset 0 1px 0 rgba(254, 254, 254, 0.12);
 }
 
 .wb-emotion-tile[data-selected="true"] .wb-emotion-tile-fill {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 html[data-high-contrast="true"] .wb-emotion-tile-fill,
@@ -2328,7 +2451,7 @@ html[data-reduce-transparency="true"] .wb-emotion-tile-fill {
 }
 
 .wb-emotion-tile-pattern {
-  border-radius: calc(var(--tile-radius, 10px) - 1.5px);
+  border-radius: inherit;
 }
 
 /* Today tab single-window framing: balanced Latest card height + scroll-snap clearance for Quick Check-In */
@@ -2415,42 +2538,42 @@ html[data-reading-comfort="true"] .wb-emotion-tile-inline {
 .wb-emotion-tile-halo {
   position: absolute;
   inset: var(--tile-glow-spread);
-  border-radius: calc(var(--tile-radius, 10px) + 2px);
+  border-radius: inherit;
   background-color: var(--tile-emotion-glow);
   filter: blur(var(--tile-glow-blur));
   opacity: 0;
   pointer-events: none;
   z-index: -1;
   will-change: transform, opacity;
-  animation: emotion-tile-glow-settle 8s cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+  animation: emotion-tile-glow-settle 8s cubic-bezier(0.22, 1, 0.36, 1) 1 both;
 }
 
-/* Crisp 1.5px Quadrant Border Pulse (250ms GPU-composited flash on press, scales cleanly to any tile radius) */
+/* Crisp 1.5px Quadrant Border Pulse (280ms GPU-composited flash on press, inherits live M3 Expressive radius) */
 @keyframes wb-quadrant-border-pulse {
   0% {
     opacity: 0.96;
-    transform: scale(0.992);
+    transform: scale(0.988);
   }
-  42% {
+  40% {
     opacity: 1;
-    transform: scale(1.012);
+    transform: scale(1.018);
   }
   100% {
     opacity: 0;
-    transform: scale(1.024);
+    transform: scale(1.036);
   }
 }
 
 .wb-emotion-border-pulse {
   position: absolute;
-  inset: -1.5px;
-  border-radius: calc(var(--tile-radius, 10px) + 1px);
-  border: 1.5px solid var(--tile-pulse-color);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tile-pulse-color) 42%, transparent);
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid var(--tile-pulse-color);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tile-pulse-color) 48%, transparent);
   pointer-events: none;
   z-index: 20;
   will-change: transform, opacity;
-  animation: wb-quadrant-border-pulse 250ms cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
+  animation: wb-quadrant-border-pulse 280ms cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
 }
 
 /* ==========================================================================
@@ -2604,74 +2727,74 @@ html[data-reading-comfort="true"] .wb-emotion-tile-inline {
   }
 }
 
-.wb-emotion-tile[data-quadrant="yellow"][data-tap-anim="a"] {
+.wb-emotion-tile-cell[data-quadrant="yellow"][data-tap-anim="a"] {
   will-change: transform;
   animation: wb-tile-yellow-a 420ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
 }
 
-.wb-emotion-tile[data-quadrant="yellow"][data-tap-anim="b"] {
+.wb-emotion-tile-cell[data-quadrant="yellow"][data-tap-anim="b"] {
   will-change: transform;
   animation: wb-tile-yellow-b 420ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
 }
 
-.wb-emotion-tile[data-quadrant="green"][data-tap-anim="a"] {
+.wb-emotion-tile-cell[data-quadrant="green"][data-tap-anim="a"] {
   will-change: transform, opacity;
   animation: wb-tile-green-a 560ms cubic-bezier(0.37, 0, 0.63, 1) 1 both;
 }
 
-.wb-emotion-tile[data-quadrant="green"][data-tap-anim="b"] {
+.wb-emotion-tile-cell[data-quadrant="green"][data-tap-anim="b"] {
   will-change: transform, opacity;
   animation: wb-tile-green-b 560ms cubic-bezier(0.37, 0, 0.63, 1) 1 both;
 }
 
-.wb-emotion-tile[data-quadrant="blue"][data-tap-anim="a"] {
+.wb-emotion-tile-cell[data-quadrant="blue"][data-tap-anim="a"] {
   will-change: transform, opacity;
   animation: wb-tile-blue-a 600ms cubic-bezier(0.33, 0, 0.2, 1) 1 both;
 }
 
-.wb-emotion-tile[data-quadrant="blue"][data-tap-anim="b"] {
+.wb-emotion-tile-cell[data-quadrant="blue"][data-tap-anim="b"] {
   will-change: transform, opacity;
   animation: wb-tile-blue-b 600ms cubic-bezier(0.33, 0, 0.2, 1) 1 both;
 }
 
-.wb-emotion-tile[data-quadrant="red"][data-tap-anim="a"] {
+.wb-emotion-tile-cell[data-quadrant="red"][data-tap-anim="a"] {
   will-change: transform;
   animation: wb-tile-red-a 380ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
 }
 
-.wb-emotion-tile[data-quadrant="red"][data-tap-anim="b"] {
+.wb-emotion-tile-cell[data-quadrant="red"][data-tap-anim="b"] {
   will-change: transform;
   animation: wb-tile-red-b 380ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
 }
 
 .dark .wb-emotion-tile {
-  --tile-glow-max: 0.11;
-  --tile-glow-blur: 6px;
-  --tile-glow-spread: -1px;
+  --tile-glow-max: 0.28;
+  --tile-glow-blur: 11px;
+  --tile-glow-spread: -2px;
 }
 
 html[data-calm-mode="true"] .wb-emotion-tile {
-  --tile-glow-max: 0.08;
-  --tile-glow-blur: 6px;
+  --tile-glow-max: 0.16;
+  --tile-glow-blur: 8px;
   --tile-glow-spread: -1px;
 }
 
 html.dark[data-calm-mode="true"] .wb-emotion-tile {
-  --tile-glow-max: 0.09;
-  --tile-glow-blur: 6px;
+  --tile-glow-max: 0.16;
+  --tile-glow-blur: 8px;
   --tile-glow-spread: -1px;
 }
 
 html[data-high-contrast="true"] .wb-emotion-tile,
 html[data-calm-mode="true"][data-high-contrast="true"] .wb-emotion-tile {
-  --tile-glow-max: 0.10;
+  --tile-glow-max: 0.14;
   --tile-glow-blur: 6px;
   --tile-glow-spread: -1px;
 }
 
 html.dark[data-high-contrast="true"] .wb-emotion-tile,
 html.dark[data-calm-mode="true"][data-high-contrast="true"] .wb-emotion-tile {
-  --tile-glow-max: 0.12;
+  --tile-glow-max: 0.16;
   --tile-glow-blur: 6px;
   --tile-glow-spread: -1px;
 }
@@ -2689,11 +2812,18 @@ html[data-reduce-motion="true"] .wb-emotion-inspect-inner {
 
 html[data-reduce-motion="true"] .wb-latest-emotion-card::before,
 html[data-reduce-motion="true"] .wb-latest-emotion-surface::after,
+html[data-reduce-motion="true"] .wb-log-latest-spotlight::before,
 html[data-reduce-motion="true"] .wb-emotion-tile-halo,
 html[data-reduce-motion="true"] .wb-emotion-border-pulse {
   animation: none !important;
   opacity: 0 !important;
   transform: scale(1) !important;
+}
+
+html[data-reduce-motion="true"] .wb-log-latest-spotlight::after {
+  animation: none !important;
+  opacity: 0.95 !important;
+  will-change: auto !important;
 }
 
 html[data-reduce-motion="true"] .wb-latest-blend-border::before {
@@ -2704,7 +2834,7 @@ html[data-reduce-motion="true"] .wb-latest-blend-border::before {
 
 html[data-reduce-motion="true"] .wb-latest-emotion-label,
 html[data-reduce-motion="true"] .wb-latest-emotion-text,
-html[data-reduce-motion="true"] .wb-emotion-tile[data-tap-anim] {
+html[data-reduce-motion="true"] .wb-emotion-tile-cell[data-tap-anim] {
   animation: none !important;
   transform: none !important;
   opacity: 1 !important;
@@ -2731,11 +2861,18 @@ html[data-reduce-motion="true"] .wb-emotion-tile-fill {
 
   html:not([data-reduce-motion="false"]) .wb-latest-emotion-card::before,
   html:not([data-reduce-motion="false"]) .wb-latest-emotion-surface::after,
+  html:not([data-reduce-motion="false"]) .wb-log-latest-spotlight::before,
   html:not([data-reduce-motion="false"]) .wb-emotion-tile-halo,
   html:not([data-reduce-motion="false"]) .wb-emotion-border-pulse {
     animation: none !important;
     opacity: 0 !important;
     transform: scale(1) !important;
+  }
+
+  html:not([data-reduce-motion="false"]) .wb-log-latest-spotlight::after {
+    animation: none !important;
+    opacity: 0.95 !important;
+    will-change: auto !important;
   }
 
   html:not([data-reduce-motion="false"]) .wb-latest-blend-border::before {
@@ -2746,7 +2883,7 @@ html[data-reduce-motion="true"] .wb-emotion-tile-fill {
 
   html:not([data-reduce-motion="false"]) .wb-latest-emotion-label,
   html:not([data-reduce-motion="false"]) .wb-latest-emotion-text,
-  html:not([data-reduce-motion="false"]) .wb-emotion-tile[data-tap-anim] {
+  html:not([data-reduce-motion="false"]) .wb-emotion-tile-cell[data-tap-anim] {
     animation: none !important;
     transform: none !important;
     opacity: 1 !important;
@@ -2757,52 +2894,23 @@ html[data-reduce-motion="true"] .wb-emotion-tile-fill {
 /* ==========================================================================
    15. Pattern 3: Expanding Active-Tab Capsule Dock (Integrated +)
    - Single centered floating Liquid Glass capsule across all viewports
-   - Active tab expands smoothly (250ms cubic-bezier(0.4, 0, 0.2, 1))
-   - Inactive tabs stay icon-only with 48px invisible touch targets
-   - Integrated (+) orb anchored flush right with crisp static finish (no glow)
+   - Detached Floating Pill Toolbar + Adjacent Expressive Action FAB (10px gap)
+   - Active tab morphs from 999px pill -> 18px squircle via M3 fastSpatial spring
+   - Inactive tabs stay icon-only with 48px invisible vertical touch targets
+   - Adjacent (+) FAB morphs from 999px orb -> 16px squircle when open / 14px on press
+   - Scroll-aware hide/show via M3 defaultSpatial spring (left:0; right:0 avoids transform clash)
    - Full Light, Dark, Calm, High-Contrast, Reduce Transparency, Reading Comfort & Reduce Motion parity
    ========================================================================== */
 
 .wb-capsule-dock-wrap {
-  position: fixed;
-  left: 50%;
-  bottom: calc(var(--capsule-dock-lift, 16px) + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  width: calc(100% - 32px);
-  max-width: 390px;
-  height: var(--capsule-dock-height, 60px);
-  z-index: var(--z-bottom-dock);
-  container-type: inline-size;
-  container-name: capsule-dock;
-  transition: opacity 180ms ease;
-}
-
-@media (min-width: 640px) {
-  .wb-capsule-dock-wrap {
-    max-width: 440px;
-  }
-}
-
-html[data-reading-comfort="true"] .wb-capsule-dock-wrap {
-  width: calc(100% - 20px);
-  max-width: 472px;
-}
-
-.wb-capsule-dock-wrap[data-locked="true"] {
-  pointer-events: none;
-  opacity: 0.45;
-}
-
-.wb-capsule-dock {
-  /* Light Mode Tokens */
+  /* Shared Light Mode Floating Toolbar + Detached FAB Tokens */
   --capsule-bg: rgba(254, 254, 254, 0.90);
   --capsule-border: rgba(191, 178, 255, 0.62);
   --capsule-specular: rgba(255, 255, 255, 0.94);
   --capsule-shadow:
-    0 14px 32px -10px rgba(26, 0, 77, 0.16),
-    0 3px 10px -2px rgba(9, 0, 26, 0.06);
-  --capsule-divider: rgba(26, 0, 77, 0.12);
-  --capsule-pill-bg: color-mix(in srgb, var(--palette-soft-lavender) 32%, var(--palette-near-white));
+    0 12px 28px -8px rgba(26, 0, 77, 0.16),
+    0 2px 8px -2px rgba(9, 0, 26, 0.08);
+  --capsule-pill-bg: color-mix(in srgb, var(--palette-soft-lavender) 34%, var(--palette-near-white));
   --capsule-pill-border: rgba(58, 0, 229, 0.24);
   --capsule-pill-fg: var(--palette-electric-indigo);
   --capsule-pill-shadow: none;
@@ -2812,32 +2920,56 @@ html[data-reading-comfort="true"] .wb-capsule-dock-wrap {
   --capsule-plus-bg: var(--palette-electric-indigo);
   --capsule-plus-fg: var(--palette-near-white);
   --capsule-plus-border: rgba(255, 255, 255, 0.24);
+  --capsule-plus-shadow:
+    0 10px 24px -6px rgba(58, 0, 229, 0.36),
+    0 2px 6px -1px rgba(26, 0, 77, 0.16);
+  --capsule-plus-open-bg: color-mix(in srgb, var(--palette-soft-lavender) 46%, var(--palette-near-white));
+  --capsule-plus-open-fg: var(--palette-deep-plum);
+  --capsule-plus-open-border: rgba(58, 0, 229, 0.34);
   --capsule-tooltip-bg: var(--palette-deep-plum);
   --capsule-tooltip-fg: var(--palette-near-white);
 
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  bottom: calc(var(--capsule-dock-lift, 16px) + env(safe-area-inset-bottom, 0px));
+  width: calc(100% - 32px);
+  max-width: 406px;
+  height: var(--capsule-dock-height, 60px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  height: 100%;
-  padding: 0 8px 0 12px;
-  border-radius: 9999px;
-  background: var(--capsule-bg);
-  border: 1px solid var(--capsule-border);
-  backdrop-filter: blur(20px) saturate(135%);
-  -webkit-backdrop-filter: blur(20px) saturate(135%);
-  box-shadow: inset 0 1px 0 var(--capsule-specular), var(--capsule-shadow);
-  isolation: isolate;
+  justify-content: center;
+  gap: 10px;
+  z-index: var(--z-bottom-dock);
+  container-type: inline-size;
+  container-name: capsule-dock;
 }
 
-/* Dark Mode Capsule Tokens — Crisp hairline separation & low paint overhead */
-.dark .wb-capsule-dock {
+@media (min-width: 640px) {
+  .wb-capsule-dock-wrap {
+    max-width: 460px;
+  }
+}
+
+html[data-reading-comfort="true"] .wb-capsule-dock-wrap {
+  width: calc(100% - 20px);
+  max-width: 492px;
+}
+
+.wb-capsule-dock-wrap[data-locked="true"] {
+  pointer-events: none;
+}
+
+/* Dark Mode Floating Toolbar + Detached FAB Tokens */
+.dark .wb-capsule-dock-wrap {
   --capsule-bg: rgba(18, 22, 21, 0.88);
-  --capsule-border: rgba(254, 254, 254, 0.10);
+  --capsule-border: rgba(254, 254, 254, 0.11);
   --capsule-specular: rgba(254, 254, 254, 0.06);
-  --capsule-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.55);
-  --capsule-divider: rgba(254, 254, 254, 0.10);
-  --capsule-pill-bg: rgba(47, 209, 158, 0.14);
+  --capsule-shadow:
+    0 12px 26px -10px rgba(0, 0, 0, 0.62),
+    0 2px 6px rgba(0, 0, 0, 0.34);
+  --capsule-pill-bg: rgba(47, 209, 158, 0.15);
   --capsule-pill-border: rgba(92, 224, 184, 0.32);
   --capsule-pill-fg: #5CE0B8;
   --capsule-pill-shadow: none;
@@ -2847,37 +2979,50 @@ html[data-reading-comfort="true"] .wb-capsule-dock-wrap {
   --capsule-plus-bg: #2FD19E;
   --capsule-plus-fg: var(--palette-near-black);
   --capsule-plus-border: rgba(255, 255, 255, 0.18);
+  --capsule-plus-shadow:
+    0 10px 24px -6px rgba(47, 209, 158, 0.32),
+    0 2px 8px rgba(0, 0, 0, 0.45);
+  --capsule-plus-open-bg: rgba(191, 178, 255, 0.22);
+  --capsule-plus-open-fg: var(--palette-soft-lavender);
+  --capsule-plus-open-border: rgba(191, 178, 255, 0.42);
   --capsule-tooltip-bg: #1E1636;
   --capsule-tooltip-fg: var(--palette-near-white);
 }
 
 /* Calm Mode: subdue luminous mint/indigo hues to soft lavender & muted plum */
-html[data-calm-mode="true"] .wb-capsule-dock {
+html[data-calm-mode="true"] .wb-capsule-dock-wrap {
   --capsule-pill-bg: #ECE8F8;
   --capsule-pill-border: rgba(61, 53, 120, 0.24);
   --capsule-pill-fg: #3D3578;
   --capsule-pill-shadow: none;
   --capsule-plus-bg: #3D3578;
   --capsule-plus-fg: var(--palette-near-white);
+  --capsule-plus-shadow: 0 8px 18px -8px rgba(61, 53, 120, 0.32);
+  --capsule-plus-open-bg: #E4DFF4;
+  --capsule-plus-open-fg: #2D265C;
+  --capsule-plus-open-border: rgba(61, 53, 120, 0.30);
 }
 
-html.dark[data-calm-mode="true"] .wb-capsule-dock {
+html.dark[data-calm-mode="true"] .wb-capsule-dock-wrap {
   --capsule-pill-bg: rgba(191, 178, 255, 0.14);
   --capsule-pill-border: rgba(191, 178, 255, 0.30);
   --capsule-pill-fg: var(--palette-soft-lavender);
   --capsule-pill-shadow: none;
   --capsule-plus-bg: var(--palette-soft-lavender);
   --capsule-plus-fg: var(--palette-near-black);
+  --capsule-plus-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.55);
+  --capsule-plus-open-bg: rgba(191, 178, 255, 0.20);
+  --capsule-plus-open-fg: var(--palette-near-white);
+  --capsule-plus-open-border: rgba(191, 178, 255, 0.36);
 }
 
 /* High-Contrast Mode: strict WCAG AAA opaque contrast & bold borders */
-html[data-high-contrast="true"] .wb-capsule-dock,
-html[data-calm-mode="true"][data-high-contrast="true"] .wb-capsule-dock {
+html[data-high-contrast="true"] .wb-capsule-dock-wrap,
+html[data-calm-mode="true"][data-high-contrast="true"] .wb-capsule-dock-wrap {
   --capsule-bg: var(--palette-near-white);
   --capsule-border: var(--palette-near-black);
   --capsule-specular: transparent;
   --capsule-shadow: 0 8px 20px -8px rgba(9, 0, 26, 0.28);
-  --capsule-divider: var(--palette-near-black);
   --capsule-pill-bg: var(--palette-deep-plum);
   --capsule-pill-border: var(--palette-near-black);
   --capsule-pill-fg: var(--palette-near-white);
@@ -2888,17 +3033,17 @@ html[data-calm-mode="true"][data-high-contrast="true"] .wb-capsule-dock {
   --capsule-plus-bg: var(--palette-deep-plum);
   --capsule-plus-fg: var(--palette-near-white);
   --capsule-plus-border: var(--palette-near-black);
-  border-width: 1.5px;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  --capsule-plus-shadow: 0 8px 18px -8px rgba(9, 0, 26, 0.34);
+  --capsule-plus-open-bg: var(--palette-near-white);
+  --capsule-plus-open-fg: var(--palette-near-black);
+  --capsule-plus-open-border: var(--palette-near-black);
 }
 
-html.dark[data-high-contrast="true"] .wb-capsule-dock {
+html.dark[data-high-contrast="true"] .wb-capsule-dock-wrap {
   --capsule-bg: var(--palette-near-black);
   --capsule-border: var(--palette-near-white);
   --capsule-specular: transparent;
   --capsule-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.72);
-  --capsule-divider: rgba(254, 254, 254, 0.56);
   --capsule-pill-bg: var(--palette-deep-plum);
   --capsule-pill-border: var(--palette-chartreuse);
   --capsule-pill-fg: var(--palette-near-white);
@@ -2909,16 +3054,44 @@ html.dark[data-high-contrast="true"] .wb-capsule-dock {
   --capsule-plus-bg: var(--palette-chartreuse);
   --capsule-plus-fg: var(--palette-near-black);
   --capsule-plus-border: var(--palette-near-white);
-  border-width: 1.5px;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  --capsule-plus-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.72);
+  --capsule-plus-open-bg: var(--palette-deep-plum);
+  --capsule-plus-open-fg: var(--palette-chartreuse);
+  --capsule-plus-open-border: var(--palette-chartreuse);
 }
 
-html.dark[data-calm-mode="true"][data-high-contrast="true"] .wb-capsule-dock {
+html.dark[data-calm-mode="true"][data-high-contrast="true"] .wb-capsule-dock-wrap {
   --capsule-pill-border: var(--palette-soft-lavender);
   --capsule-inactive-hover-fg: var(--palette-soft-lavender);
   --capsule-plus-bg: var(--palette-soft-lavender);
   --capsule-plus-fg: var(--palette-near-black);
+  --capsule-plus-open-fg: var(--palette-soft-lavender);
+  --capsule-plus-open-border: var(--palette-soft-lavender);
+}
+
+.wb-capsule-dock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 6px;
+  border-radius: 9999px;
+  background: var(--capsule-bg);
+  border: 1px solid var(--capsule-border);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  box-shadow: inset 0 1px 0 var(--capsule-specular), var(--capsule-shadow);
+  isolation: isolate;
+}
+
+html[data-high-contrast="true"] .wb-capsule-dock,
+html[data-calm-mode="true"][data-high-contrast="true"] .wb-capsule-dock,
+html.dark[data-high-contrast="true"] .wb-capsule-dock {
+  border-width: 1.5px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* Reduce Transparency Mode: remove all blur/specular layers, solid #FEFEFE / #09001A + 1.5px border */
@@ -2958,30 +3131,30 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
-  gap: 2px;
+  gap: 3px;
 }
 
-/* GPU-Composited Sliding Active Tab Highlight Pill (shared layoutId transform) */
+/* GPU-Composited Sliding Active Tab Highlight Squircle (shared layoutId spring) */
 .wb-capsule-active-pill {
   position: absolute;
   inset: 0;
   z-index: 0;
-  border-radius: 9999px;
+  border-radius: 18px;
   background: var(--capsule-pill-bg);
   border: 1px solid var(--capsule-pill-border);
   box-shadow: var(--capsule-pill-shadow);
   pointer-events: none;
 }
 
-/* Individual Tab Button (Inactive icon-only <-> Active expanding pill) */
+/* Individual Tab Button (Inactive pill <-> Active expanding 18px squircle) */
 .wb-capsule-tab {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: 1 1 0%;
-  min-width: 40px;
-  height: 44px;
+  min-width: 38px;
+  height: 46px;
   padding: 0 8px;
   border-radius: 9999px;
   border: 1px solid transparent;
@@ -3001,7 +3174,7 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
   position: absolute;
   inset: -4px 0;
   min-height: 48px;
-  border-radius: 9999px;
+  border-radius: 18px;
 }
 
 .wb-capsule-tab:hover:not([data-active="true"]):not([aria-disabled="true"]) {
@@ -3011,7 +3184,7 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
 
 .wb-capsule-tab[data-active="true"] {
   flex: 0 0 auto;
-  padding: 10px 16px;
+  padding: 10px 15px;
   background: transparent;
   border-color: transparent;
   color: var(--capsule-pill-fg);
@@ -3025,7 +3198,7 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
   flex-shrink: 0;
 }
 
-/* Instant layout geometry so GPU sliding pill measures exact target width; crisp opacity reveal */
+/* Instant layout geometry so GPU sliding squircle measures exact target width; crisp opacity reveal */
 .wb-capsule-label-wrap {
   position: relative;
   z-index: 1;
@@ -3046,7 +3219,7 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
   overflow: hidden;
   white-space: nowrap;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1;
 }
@@ -3083,58 +3256,66 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
   transform: translateX(-50%) translateY(0);
 }
 
-/* Vertical Hairline Divider before Integrated (+) Orb */
-.wb-capsule-divider {
-  width: 1px;
-  height: 24px;
-  flex-shrink: 0;
-  background: var(--capsule-divider);
-}
-
-/* Integrated Quick-Action (+) Orb — Flush Right Edge */
+/* Adjacent Detached Expressive Action Button (Quick Check-In FAB) */
 .wb-capsule-plus-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   flex-shrink: 0;
   border-radius: 9999px;
   background: var(--capsule-plus-bg);
   color: var(--capsule-plus-fg);
   border: 1px solid var(--capsule-plus-border);
+  box-shadow: var(--capsule-plus-shadow);
   cursor: pointer;
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
   transition:
-    transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 150ms ease;
+    background-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.wb-capsule-plus-btn:hover:not([aria-disabled="true"]) {
-  opacity: 0.9;
+.wb-capsule-plus-btn[data-open="true"] {
+  background: var(--capsule-plus-open-bg);
+  color: var(--capsule-plus-open-fg);
+  border-color: var(--capsule-plus-open-border);
 }
 
-.wb-capsule-plus-btn:active:not([aria-disabled="true"]) {
-  transform: scale(0.93);
+@media (min-width: 640px) {
+  .wb-capsule-plus-btn {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+html[data-high-contrast="true"] .wb-capsule-plus-btn,
+html[data-reduce-transparency="true"] .wb-capsule-plus-btn {
+  border-width: 1.5px;
 }
 
 /* Container Queries for Compact Viewports (320px–380px) & Reading Comfort */
 @container capsule-dock (max-width: 380px) {
+  .wb-capsule-dock-wrap {
+    gap: 8px;
+  }
+
   .wb-capsule-dock {
-    padding: 0 7px 0 9px;
-    gap: 6px;
+    padding: 5px;
   }
 
   .wb-capsule-tab {
     min-width: 34px;
-    height: 42px;
+    height: 44px;
     padding: 0 5px;
   }
 
   .wb-capsule-tab[data-active="true"] {
-    padding: 9px 13px;
+    padding: 9px 12px;
   }
 
   .wb-capsule-tab[data-active="true"] .wb-capsule-label-wrap {
@@ -3146,15 +3327,14 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
   }
 
   .wb-capsule-plus-btn {
-    width: 42px;
-    height: 42px;
+    width: 52px;
+    height: 52px;
   }
 }
 
 @container capsule-dock (max-width: 332px) {
   .wb-capsule-dock {
-    padding: 0 6px 0 7px;
-    gap: 4px;
+    padding: 4px;
   }
 
   .wb-capsule-tabs {
@@ -3163,7 +3343,7 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
 
   .wb-capsule-tab {
     min-width: 30px;
-    height: 40px;
+    height: 42px;
     padding: 0 3px;
   }
 
@@ -3181,12 +3361,12 @@ html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
   }
 
   .wb-capsule-label {
-    font-size: 0.75rem;
+    font-size: 0.74rem;
   }
 
   .wb-capsule-plus-btn {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
   }
 }
 
@@ -3791,13 +3971,12 @@ textarea,
   touch-action: manipulation;
 }
 
-/* 20.6 Micro-Press Compression (:active scale(0.98) over 90ms) on Tiles, Routine Cards & Settings Rows */
+/* 20.6 Micro-Press Compression on Cards & Rows (motion/react fastSpatial owns .wb-emotion-tile transform & shape morph) */
 .wb-emotion-tile {
   transition:
-    transform 90ms cubic-bezier(0.2, 0, 0, 1),
     color 180ms cubic-bezier(0.4, 0, 0.2, 1),
     border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
     filter 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -3814,7 +3993,6 @@ textarea,
     color 140ms ease;
 }
 
-.wb-emotion-tile:active:not(:disabled),
 .wb-routine-card:active:not(:has(input:focus, textarea:focus)),
 .wb-pane-item-card:active:not(:has(input:focus, textarea:focus, select:focus)),
 .wb-pane-toggle-row:active:not(:has(input:focus, textarea:focus, select:focus)),

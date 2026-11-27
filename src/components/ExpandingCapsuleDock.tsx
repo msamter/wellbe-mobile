@@ -8,6 +8,7 @@ import {
   Sun,
 } from 'lucide-react';
 import { AppTab } from '../types/wellbe';
+import { getM3Spring, m3Shapes } from '../design/m3ExpressiveTokens';
 
 const NotepadIcon: React.FC<{ className?: string; 'aria-hidden'?: boolean }> = ({
   className,
@@ -79,6 +80,7 @@ interface ExpandingCapsuleDockProps {
   plainLanguage: boolean;
   quickCheckInOpen: boolean;
   reduceMotion?: boolean;
+  calmMode?: boolean;
 }
 
 export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.memo(
@@ -90,12 +92,15 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
     plainLanguage,
     quickCheckInOpen,
     reduceMotion = false,
+    calmMode = false,
   }) => {
     const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
     const tabsRowRef = useRef<HTMLDivElement>(null);
+    const lastScrollYRef = useRef(0);
     const [layoutEpoch, setLayoutEpoch] = useState(0);
+    const [scrollVisible, setScrollVisible] = useState(true);
 
-    // Keep the shared layoutId spring pill pixel-aligned on viewport resize, orientation change, or font-scale shifts
+    // Keep the shared layoutId spring indicator pixel-aligned on viewport resize, orientation change, or font-scale shifts
     useEffect(() => {
       const el = tabsRowRef.current;
       if (!el || typeof ResizeObserver === 'undefined') return;
@@ -113,6 +118,47 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
       return () => ro.disconnect();
     }, []);
 
+    // Always reveal toolbar on tab switch, Coach single-viewport screen, or open quick sheet
+    useEffect(() => {
+      setScrollVisible(true);
+      lastScrollYRef.current = typeof window !== 'undefined' ? window.scrollY : 0;
+    }, [activeTab, quickCheckInOpen, locked]);
+
+    // M3 Expressive Scroll-Aware Hide/Show: smoothly springs down past 24px on scroll down, bounces back on scroll up
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      if (activeTab === 'coach' || quickCheckInOpen || locked) {
+        setScrollVisible(true);
+        return;
+      }
+
+      lastScrollYRef.current = window.scrollY;
+      let ticking = false;
+
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(() => {
+          ticking = false;
+          const currentY = Math.max(0, window.scrollY);
+          const prevY = lastScrollYRef.current;
+          const delta = currentY - prevY;
+
+          if (currentY <= 24) {
+            setScrollVisible(true);
+          } else if (delta > 6 && currentY > 24) {
+            setScrollVisible(false);
+          } else if (delta < -4) {
+            setScrollVisible(true);
+          }
+          lastScrollYRef.current = currentY;
+        });
+      };
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      return () => window.removeEventListener('scroll', onScroll);
+    }, [activeTab, quickCheckInOpen, locked]);
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, idx: number) => {
       if (locked) return;
       let nextIdx = idx;
@@ -124,37 +170,57 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
       else return;
 
       e.preventDefault();
+      setScrollVisible(true);
       onSelectTab(CAPSULE_NAV_TABS[nextIdx].id);
       tabRefs.current[nextIdx]?.focus();
     };
 
-    const pillTransition = reduceMotion
-      ? { duration: 0 }
-      : {
-          type: 'tween' as const,
-          duration: 0.2,
-          ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number],
-        };
+    const fastSpring = getM3Spring('fastSpatial', {
+      reduceMotion,
+      calmMode,
+    });
+    const dockSpring = getM3Spring('defaultSpatial', {
+      reduceMotion,
+      calmMode,
+    });
+
+    const isVisible = scrollVisible || quickCheckInOpen || activeTab === 'coach';
 
     return (
-      <nav
+      <motion.nav
         aria-label="Primary navigation"
-        aria-hidden={locked || undefined}
+        aria-hidden={locked || !isVisible || undefined}
         data-locked={locked ? 'true' : 'false'}
+        data-visible={isVisible ? 'true' : 'false'}
         data-no-drag-scroll="true"
+        onFocus={() => setScrollVisible(true)}
+        initial={reduceMotion ? false : { y: 80, opacity: 0 }}
+        animate={{
+          y: isVisible ? 0 : 104,
+          opacity: isVisible ? (locked ? 0.45 : 1) : 0,
+        }}
+        transition={dockSpring}
+        style={{
+          pointerEvents: isVisible && !locked ? 'auto' : 'none',
+        }}
         className="wb-capsule-dock-wrap"
       >
+        {/* Main M3 Expressive Floating Pill Toolbar */}
         <div className="wb-capsule-dock">
-          {/* 5-Tab Expanding Active-Tab Row with GPU-Composited Sliding Pill */}
           <LayoutGroup id="wb-capsule-dock-tabs">
-            <div ref={tabsRowRef} className="wb-capsule-tabs" role="tablist" aria-label="App sections">
+            <div
+              ref={tabsRowRef}
+              className="wb-capsule-tabs"
+              role="tablist"
+              aria-label="App sections"
+            >
               {CAPSULE_NAV_TABS.map((tab, idx) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
                 const accessibleName = plainLanguage ? tab.plainDescription : tab.label;
 
                 return (
-                  <button
+                  <motion.button
                     key={tab.id}
                     ref={(el) => {
                       tabRefs.current[idx] = el;
@@ -165,7 +231,7 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
                     aria-current={isActive ? 'page' : undefined}
                     aria-label={isActive ? undefined : accessibleName}
                     title={isActive ? undefined : accessibleName}
-                    tabIndex={locked ? -1 : isActive ? 0 : -1}
+                    tabIndex={locked || !isVisible ? -1 : isActive ? 0 : -1}
                     aria-disabled={locked || undefined}
                     data-active={isActive ? 'true' : 'false'}
                     onClick={() => {
@@ -173,6 +239,12 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
                       onSelectTab(tab.id);
                     }}
                     onKeyDown={(e) => handleKeyDown(e, idx)}
+                    whileTap={reduceMotion || locked ? undefined : { scale: 0.92 }}
+                    animate={{
+                      // Signature M3 Expressive morph: Pill (999px) when idle -> Squircle (18px) when active
+                      borderRadius: isActive ? 18 : 999,
+                    }}
+                    transition={fastSpring}
                     className="wb-capsule-tab"
                   >
                     {isActive && (
@@ -181,8 +253,8 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
                         layoutDependency={`${activeTab}-${layoutEpoch}`}
                         aria-hidden="true"
                         className="wb-capsule-active-pill"
-                        style={{ borderRadius: 9999 }}
-                        transition={pillTransition}
+                        style={{ borderRadius: 18 }}
+                        transition={fastSpring}
                       />
                     )}
                     <Icon className="wb-capsule-tab-icon" aria-hidden={true} />
@@ -197,43 +269,54 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
                         {tab.label}
                       </span>
                     )}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
           </LayoutGroup>
-
-          {/* Subtle Divider Separating Nav Tabs from Quick-Action Orb */}
-          <span className="wb-capsule-divider" aria-hidden="true" />
-
-          {/* Integrated Quick-Action (+) Orb — Flush Right Edge */}
-          <button
-            type="button"
-            aria-disabled={locked || undefined}
-            tabIndex={locked ? -1 : 0}
-            data-open={quickCheckInOpen ? 'true' : 'false'}
-            onClick={() => {
-              if (locked) return;
-              onQuickCheckIn();
-            }}
-            aria-haspopup="dialog"
-            aria-expanded={quickCheckInOpen}
-            aria-label={
-              plainLanguage
-                ? 'Quick Check-In — Log how you feel right now'
-                : 'Quick Check-In'
-            }
-            title="Quick Check-In"
-            className="wb-capsule-plus-btn"
-          >
-            <Plus
-              className="wb-capsule-plus-icon relative z-10 h-5 w-5 shrink-0"
-              strokeWidth={2.5}
-              aria-hidden="true"
-            />
-          </button>
         </div>
-      </nav>
+
+        {/* Adjacent Detached Expressive Action Button (Quick Check-In FAB) */}
+        <motion.button
+          type="button"
+          aria-disabled={locked || undefined}
+          tabIndex={locked || !isVisible ? -1 : 0}
+          data-open={quickCheckInOpen ? 'true' : 'false'}
+          onClick={() => {
+            if (locked) return;
+            onQuickCheckIn();
+          }}
+          whileHover={reduceMotion || locked ? undefined : { scale: 1.04 }}
+          whileTap={
+            reduceMotion || locked
+              ? undefined
+              : { scale: 0.9, borderRadius: m3Shapes.squircle }
+          }
+          animate={{
+            // Morphs smoothly from 999px pill/orb -> 16px squircle when Quick Check-In is active
+            borderRadius: quickCheckInOpen ? m3Shapes.medium : m3Shapes.pill,
+          }}
+          transition={fastSpring}
+          aria-haspopup="dialog"
+          aria-expanded={quickCheckInOpen}
+          aria-label={
+            plainLanguage
+              ? 'Quick Check-In — Log how you feel right now'
+              : 'Quick Check-In'
+          }
+          title="Quick Check-In"
+          className="wb-capsule-plus-btn"
+        >
+          <motion.span
+            aria-hidden="true"
+            animate={{ rotate: quickCheckInOpen ? 45 : 0 }}
+            transition={fastSpring}
+            className="relative z-10 grid place-items-center"
+          >
+            <Plus className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+          </motion.span>
+        </motion.button>
+      </motion.nav>
     );
   }
 );

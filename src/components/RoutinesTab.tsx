@@ -15,6 +15,7 @@ import { MoodEntry, ResetProtocol, ScheduledRoutine } from '../types/wellbe';
 import { RESET_PROTOCOLS, toLocalDateKey } from '../data/wellbeData';
 import { useAccessibility } from '../context/AccessibilityContext';
 import { AffectiveGlyph, getQuadrantStyle } from './AffectiveGlyphs';
+import { ExpressiveButton, ExpressiveChip } from './ExpressiveControls';
 
 interface RoutinesTabProps {
   routines: ScheduledRoutine[];
@@ -247,18 +248,14 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
             </p>
           </div>
 
-          <button
-            type="button"
+          <ExpressiveButton
+            variant="filled"
+            size="md"
             onClick={onOpenNewRoutine}
-            className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-xl px-4 text-sm font-semibold transition-colors"
-            style={{
-              backgroundColor: 'var(--accent-primary)',
-              color: 'var(--accent-primary-ink)',
-            }}
+            leadingIcon={<Plus className="h-4 w-4" />}
           >
-            <Plus className="h-4 w-4" />
-            <span>New Routine</span>
-          </button>
+            New Routine
+          </ExpressiveButton>
         </section>
 
         {/* Contextual Routine Guidance Banner (Shown ONLY when an unpleasant Red/Blue state is active) */}
@@ -306,20 +303,18 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
                 </p>
               </div>
               {contextualMode === 'high-unpleasant' && (
-                <button
-                  type="button"
+                <ExpressiveButton
+                  variant="filled"
+                  size="md"
                   onClick={onLaunchPanicAnchor}
-                  className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 text-xs font-semibold transition-opacity hover:opacity-95"
+                  leadingIcon={<Volume2 className="h-4 w-4 shrink-0" />}
                   style={{
                     backgroundColor: 'var(--q-red-solid)',
                     color: 'var(--q-red-ink)',
                   }}
                 >
-                  <Volume2 className="h-4 w-4 shrink-0" />
-                  <span>
-                    {a11y.plainLanguage ? 'Start Panic Calm Guide' : 'Start Voice Panic Anchor'}
-                  </span>
-                </button>
+                  {a11y.plainLanguage ? 'Start Panic Calm Guide' : 'Start Voice Panic Anchor'}
+                </ExpressiveButton>
               )}
             </div>
           </section>
@@ -355,26 +350,27 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
                 {RESET_DURATION_OPTIONS.map((mins) => {
                   const selected = resetDurationMin === mins;
                   return (
-                    <button
+                    <ExpressiveChip
                       key={mins}
-                      type="button"
-                      aria-pressed={selected}
+                      label={`${mins} min`}
+                      selected={selected}
+                      showCheckOnSelect={false}
                       onClick={() => handleSelectDuration(mins)}
-                      className="min-h-[40px] min-w-[54px] rounded-xl border px-3 text-xs font-semibold tabular-nums transition-colors"
-                      style={{
-                        backgroundColor: selected
-                          ? 'var(--accent-primary)'
-                          : 'var(--surface-subtle)',
-                        color: selected
-                          ? 'var(--accent-primary-ink)'
-                          : 'var(--ink-secondary)',
-                        borderColor: selected
-                          ? 'var(--accent-primary)'
-                          : 'var(--border-hairline)',
-                      }}
-                    >
-                      {mins} min
-                    </button>
+                      className="min-h-[40px] min-w-[58px] justify-center"
+                      toneStyle={
+                        selected
+                          ? {
+                              backgroundColor: 'var(--accent-primary)',
+                              color: 'var(--accent-primary-ink)',
+                              border: '1px solid var(--accent-primary)',
+                            }
+                          : {
+                              backgroundColor: 'var(--surface-subtle)',
+                              color: 'var(--ink-secondary)',
+                              border: '1px solid var(--border-hairline)',
+                            }
+                      }
+                    />
                   );
                 })}
               </div>
@@ -382,49 +378,51 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
 
             {/* Integrated Native Routine Quick Modules (Voice Panic Anchor & Gratitude Capture) */}
             <div className="flex flex-wrap items-center gap-2 border-t border-[var(--border-hairline)] pt-3 lg:border-t-0 lg:pt-0">
-              <button
-                type="button"
+              <ExpressiveButton
+                variant="outlined"
+                size="md"
+                selected={contextualMode === 'high-unpleasant'}
                 onClick={onLaunchPanicAnchor}
-                className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-xl border px-3.5 text-xs font-semibold transition-colors"
+                leadingIcon={<ShieldAlert className="h-3.5 w-3.5 shrink-0" />}
                 style={
                   contextualMode === 'high-unpleasant'
                     ? {
                         backgroundColor: 'var(--q-red-bg)',
-                        borderColor: 'var(--q-red-solid)',
+                        border: '1px solid var(--q-red-solid)',
                         color: 'var(--q-red-fg)',
                       }
                     : {
                         backgroundColor: 'var(--surface-subtle)',
-                        borderColor: 'var(--border-hairline)',
+                        border: '1px solid var(--border-hairline)',
                         color: 'var(--ink-primary)',
                       }
                 }
               >
-                <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
-                <span>{a11y.plainLanguage ? 'Panic Calm Guide' : 'Voice Panic Anchor'}</span>
-              </button>
+                {a11y.plainLanguage ? 'Panic Calm Guide' : 'Voice Panic Anchor'}
+              </ExpressiveButton>
 
-              <button
-                type="button"
+              <ExpressiveButton
+                variant="outlined"
+                size="md"
+                selected={contextualMode === 'low-unpleasant'}
                 onClick={() => launchWithResetDuration(gratitudeProtocol)}
-                className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-xl border px-3.5 text-xs font-semibold transition-colors"
+                leadingIcon={<Heart className="h-3.5 w-3.5 shrink-0" />}
                 style={
                   contextualMode === 'low-unpleasant'
                     ? {
                         backgroundColor: 'var(--q-blue-bg)',
-                        borderColor: 'var(--q-blue-solid)',
+                        border: '1px solid var(--q-blue-solid)',
                         color: 'var(--q-blue-fg)',
                       }
                     : {
                         backgroundColor: 'var(--surface-subtle)',
-                        borderColor: 'var(--border-hairline)',
+                        border: '1px solid var(--border-hairline)',
                         color: 'var(--ink-primary)',
                       }
                 }
               >
-                <Heart className="h-3.5 w-3.5 shrink-0" />
-                <span>Gratitude Capture</span>
-              </button>
+                Gratitude Capture
+              </ExpressiveButton>
             </div>
           </div>
         </section>
@@ -608,37 +606,41 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
 
                       {/* Routine Actions (All ≥44px touch height) */}
                       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-                        <button
-                          type="button"
+                        <ExpressiveButton
+                          variant="filled"
+                          size="md"
                           onClick={() => onRunSequence(routine)}
-                          className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-xl px-4 text-xs font-semibold transition-colors"
-                          style={{
-                            backgroundColor: 'var(--accent-primary)',
-                            color: 'var(--accent-primary-ink)',
-                          }}
+                          leadingIcon={<Play className="h-3.5 w-3.5 fill-current" />}
                         >
-                          <Play className="h-3.5 w-3.5 fill-current" />
-                          <span>Run Sequence</span>
-                        </button>
+                          Run Sequence
+                        </ExpressiveButton>
 
                         <div className="flex flex-wrap items-center gap-2">
-                          <button
-                            type="button"
+                          <ExpressiveButton
+                            variant="outlined"
+                            size="md"
                             onClick={() => onEditRoutine(routine)}
-                            className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 text-xs font-semibold text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
+                            leadingIcon={<Edit3 className="h-3.5 w-3.5 shrink-0" />}
+                            style={{
+                              backgroundColor: 'var(--surface-subtle)',
+                              color: 'var(--ink-secondary)',
+                            }}
                           >
-                            <Edit3 className="h-3.5 w-3.5 shrink-0" />
-                            <span>Edit</span>
-                          </button>
-                          <button
-                            type="button"
+                            Edit
+                          </ExpressiveButton>
+                          <ExpressiveButton
+                            variant="outlined"
+                            size="md"
                             onClick={() => onDeleteRoutine(routine.id)}
-                            className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 text-xs font-semibold text-[var(--q-red-fg)] hover:bg-[var(--q-red-bg)]"
+                            leadingIcon={<Trash2 className="h-3.5 w-3.5 shrink-0" />}
                             aria-label={`Delete ${routine.name}`}
+                            style={{
+                              backgroundColor: 'var(--surface-subtle)',
+                              color: 'var(--q-red-fg)',
+                            }}
                           >
-                            <Trash2 className="h-3.5 w-3.5 shrink-0" />
-                            <span>Delete</span>
-                          </button>
+                            Delete
+                          </ExpressiveButton>
                         </div>
                       </div>
                     </article>
@@ -709,23 +711,14 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
                     placeholder={lowEnergyGratitudePlaceholder}
                     className="min-h-[44px] flex-1 rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3 text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-muted)]"
                   />
-                  <button
+                  <ExpressiveButton
                     type="submit"
-                    className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-4 text-xs font-semibold transition-colors"
-                    style={{
-                      backgroundColor: 'var(--accent-primary)',
-                      color: 'var(--accent-primary-ink)',
-                    }}
+                    variant="filled"
+                    size="md"
+                    leadingIcon={gratitudeSaved ? <Check className="h-3.5 w-3.5" /> : undefined}
                   >
-                    {gratitudeSaved ? (
-                      <>
-                        <Check className="h-3.5 w-3.5" />
-                        <span>Saved</span>
-                      </>
-                    ) : (
-                      <span>Save Entry</span>
-                    )}
-                  </button>
+                    {gratitudeSaved ? 'Saved' : 'Save Entry'}
+                  </ExpressiveButton>
                 </div>
                 {gratitudeError && (
                   <p role="alert" className="text-xs font-medium text-[var(--q-red-fg)]">
@@ -801,29 +794,29 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
                         : protocol.summary}
                     </p>
                     <div className="mt-3">
-                      <button
-                        type="button"
+                      <ExpressiveButton
+                        variant={
+                          isPanic && contextualMode === 'high-unpleasant' ? 'filled' : 'outlined'
+                        }
+                        size="md"
                         onClick={() => launchWithResetDuration(protocol)}
-                        className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl border px-3.5 text-xs font-semibold transition-colors"
+                        leadingIcon={
+                          isPanic ? (
+                            <Volume2 className="h-3.5 w-3.5" />
+                          ) : (
+                            <Play className="h-3.5 w-3.5" />
+                          )
+                        }
                         style={
                           isPanic && contextualMode === 'high-unpleasant'
                             ? {
                                 backgroundColor: 'var(--q-red-solid)',
-                                borderColor: 'var(--q-red-solid)',
+                                border: '1px solid var(--q-red-solid)',
                                 color: 'var(--q-red-ink)',
                               }
-                            : {
-                                backgroundColor: 'var(--surface-card)',
-                                borderColor: 'var(--border-hairline)',
-                                color: 'var(--ink-primary)',
-                              }
+                            : undefined
                         }
                       >
-                        {isPanic ? (
-                          <Volume2 className="h-3.5 w-3.5" />
-                        ) : (
-                          <Play className="h-3.5 w-3.5" />
-                        )}
                         <span className="tabular-nums">
                           {isPanic
                             ? a11y.plainLanguage
@@ -833,7 +826,7 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
                               ? 'Open Gratitude Capture'
                               : `Start ${resetDurationMin}-min module`}
                         </span>
-                      </button>
+                      </ExpressiveButton>
                     </div>
                   </div>
                 );

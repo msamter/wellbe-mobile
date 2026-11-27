@@ -42,11 +42,13 @@ import { useFocusTrap } from '../hooks/useFocusTrap';
 import { cancelActiveDragScroll, useDragToScroll } from '../hooks/useDragToScroll';
 import { useAccessibility } from '../context/AccessibilityContext';
 import type { SettingsTabId } from './SettingsModal';
+import { ExpressiveIconButton } from './ExpressiveControls';
 
 /* ==========================================================================
    1. Instant Check-In Overlay (Capsule + Triggered — Portal Single-Layer Motion)
    ========================================================================== */
 const INSTANT_SELECTION_RESET_MS = 5000;
+const INSTANT_CONFIRM_BEAT_MS = 460;
 
 interface QuickCheckInSheetProps {
   open: boolean;
@@ -73,6 +75,7 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
   const a11y = useAccessibility();
   const cardRef = useRef<HTMLDivElement>(null);
   const phaseTimerRef = useRef<number | null>(null);
+  const closeDelayTimerRef = useRef<number | null>(null);
   const selectionResetTimerRef = useRef<number | null>(null);
   const loggedThisOpenRef = useRef(false);
   const onMountedChangeRef = useRef(onMountedChange);
@@ -92,6 +95,18 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
   const phaseRef = useRef<OverlayMotionPhase>(phase);
   phaseRef.current = phase;
 
+  const clearCloseDelayTimer = useCallback(() => {
+    if (closeDelayTimerRef.current !== null) {
+      window.clearTimeout(closeDelayTimerRef.current);
+      closeDelayTimerRef.current = null;
+    }
+  }, []);
+
+  const handleRequestClose = useCallback(() => {
+    clearCloseDelayTimer();
+    onClose();
+  }, [clearCloseDelayTimer, onClose]);
+
   // Notify parent synchronously across mount/unmount so fixed top navbar never drops beneath exiting scrim
   useEffect(() => {
     onMountedChangeRef.current?.(mounted);
@@ -99,12 +114,13 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
 
   useEffect(() => {
     return () => {
+      clearCloseDelayTimer();
       onMountedChangeRef.current?.(false);
     };
-  }, []);
+  }, [clearCloseDelayTimer]);
 
   // Focus trap stays active only while open (immediately releases on close so + can be re-tapped)
-  useFocusTrap(cardRef, onClose, mounted && open);
+  useFocusTrap(cardRef, handleRequestClose, mounted && open);
 
   // Safe mount / unmount staging with rapid-toggle interruption & fallback cleanup timer
   useEffect(() => {
@@ -112,6 +128,7 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
       window.clearTimeout(phaseTimerRef.current);
       phaseTimerRef.current = null;
     }
+    clearCloseDelayTimer();
 
     cancelActiveDragScroll();
     const reduced = a11y.reduceMotion;
@@ -119,6 +136,7 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
     if (open) {
       loggedThisOpenRef.current = false;
       setJustTappedEmotionId(null);
+      setSheetGlowBurstId((n) => n + 1);
       mountedRef.current = true;
       setMounted(true);
       if (reduced) {
@@ -154,7 +172,7 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
         phaseTimerRef.current = null;
       }
     };
-  }, [open, a11y.reduceMotion]);
+  }, [open, a11y.reduceMotion, clearCloseDelayTimer]);
 
   const handleCardAnimationEnd = useCallback(
     (e: React.AnimationEvent<HTMLDivElement>) => {
@@ -186,14 +204,23 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
     (emotion: EmotionDef) => {
       if (phaseRef.current === 'exiting' || loggedThisOpenRef.current) return;
       clearSelectionResetTimer();
+      clearCloseDelayTimer();
       loggedThisOpenRef.current = true;
       setJustTappedEmotionId(emotion.id);
       setSheetGlowBurstId((n) => n + 1);
       // Immediate 1-tap logging with safe empty defaults for optional drivers & note
       onSubmit(emotion, [], '');
-      onClose();
+      if (a11y.reduceMotion) {
+        onClose();
+        return;
+      }
+      // Hold briefly so the tapped tile completes its M3 Expressive morph, color wave, border pulse, glow halo & quadrant choreography
+      closeDelayTimerRef.current = window.setTimeout(() => {
+        closeDelayTimerRef.current = null;
+        onClose();
+      }, INSTANT_CONFIRM_BEAT_MS);
     },
-    [clearSelectionResetTimer, onSubmit, onClose]
+    [clearSelectionResetTimer, clearCloseDelayTimer, onSubmit, onClose, a11y.reduceMotion]
   );
 
   const effectiveSelectedIds = useMemo(
@@ -207,7 +234,7 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
   // and cancel cleanly on new selection, sheet close, or unmount.
   useEffect(() => {
     clearSelectionResetTimer();
-    if (!open || !effectiveSelectedKey) return;
+    if (!open || !effectiveSelectedKey || loggedThisOpenRef.current) return;
     selectionResetTimerRef.current = window.setTimeout(() => {
       selectionResetTimerRef.current = null;
       setJustTappedEmotionId(null);
@@ -231,7 +258,7 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
         isExiting ? 'pointer-events-none' : ''
       }`}
       onClick={() => {
-        if (!isExiting) onClose();
+        if (!isExiting) handleRequestClose();
       }}
     >
       <div
@@ -247,8 +274,8 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
           isExiting ? 'pointer-events-none' : ''
         }`}
       >
-        <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-1 flex-col overflow-hidden px-3.5 sm:px-6 lg:px-8">
-          {/* Header anchored directly beneath Fixed Top Navbar with Settings-matched X close control */}
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-1 flex-col overflow-visible px-3.5 sm:px-6 lg:px-8">
+          {/* Header anchored directly beneath Fixed Top Navbar with M3 Expressive close control */}
           <div className="shrink-0 border-b border-[var(--border-hairline)] py-2.5 sm:py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 flex-1 flex-col justify-center">
@@ -264,21 +291,22 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
                     : 'Tap any emotion to log immediately.'}
                 </p>
               </div>
-              <button
-                type="button"
+              <ExpressiveIconButton
+                variant="standard"
+                size={44}
+                ariaLabel="Close Instant Check-In"
                 data-no-drag-scroll="true"
                 onClick={() => {
-                  if (!isExiting) onClose();
+                  if (!isExiting) handleRequestClose();
                 }}
-                aria-label="Close Instant Check-In"
-                className="wb-overlay-close-btn flex h-[44px] w-[44px] min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl p-0 text-[var(--ink-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
+                className="text-[var(--ink-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
-              </button>
+              </ExpressiveIconButton>
             </div>
           </div>
 
-          {/* Full-Viewport Equal-Height 2x8 Emotion Grid (100% height, zero dead space, zero scroll) */}
+          {/* Full-Viewport Equal-Height 2x8 Emotion Grid (100% height, zero dead space, zero scroll, identical glow & expressive physics) */}
           <div
             className="flex min-h-0 flex-1 flex-col overflow-visible pt-2.5 sm:pt-3"
             style={{
@@ -291,6 +319,9 @@ export const QuickCheckInSheet: React.FC<QuickCheckInSheetProps> = React.memo(
               onSelectEmotion={handleSelectEmotion}
               fitViewport
               layoutMode="sheet"
+              patternAssist={a11y.patternAssist}
+              reduceMotion={a11y.reduceMotion}
+              animateEntrance={open && !isExiting}
               glowActive={Boolean(effectiveSelectedIds && effectiveSelectedIds.length > 0)}
               glowBurstId={sheetGlowBurstId}
               syncFocusKey={open}

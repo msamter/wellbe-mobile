@@ -1403,7 +1403,7 @@ export const VoicePanicAnchorOverlay: React.FC<PanicAnchorProps> = ({
           onClick={() => setManualPhraseOffset((o) => o + 1)}
           className="liquid-glass min-h-[46px] flex-1 rounded-xl px-4 text-xs font-semibold text-[var(--ink-primary)]"
         >
-          Next Grounding Cue
+          Next Cue
         </button>
         <button
           type="button"

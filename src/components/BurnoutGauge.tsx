@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Sparkles, Wind } from 'lucide-react';
 import { TrendsAnalytics } from '../utils/analytics';
 import { useAccessibility } from '../context/AccessibilityContext';
+import { getM3Spring, m3Shapes } from '../design/m3ExpressiveTokens';
+import { ExpressiveButton } from './ExpressiveControls';
 
 interface BurnoutGaugeProps {
   analytics: TrendsAnalytics;
@@ -51,8 +54,23 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
     onLaunchBreathingReset,
   }) => {
     const a11y = useAccessibility();
+    const osReduced = useReducedMotion();
+    const reduceMotion = Boolean(osReduced || a11y.reduceMotion);
     const isPlain = plainLanguage || a11y.plainLanguage;
     const [preview, setPreview] = useState<PreviewMode>('live');
+
+    const fastSpring = getM3Spring('fastSpatial', {
+      reduceMotion,
+      calmMode: a11y.calmMode,
+    });
+    const spatialSpring = getM3Spring('defaultSpatial', {
+      reduceMotion,
+      calmMode: a11y.calmMode,
+    });
+    const effectsSpring = getM3Spring('defaultEffects', {
+      reduceMotion,
+      calmMode: a11y.calmMode,
+    });
 
     const safeSleepHours = Number.isFinite(analytics.avgSleepHours) ? analytics.avgSleepHours : 0;
     const safeRestingHr = Number.isFinite(analytics.avgRestingHr) ? analytics.avgRestingHr : 0;
@@ -117,12 +135,24 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
             ? 'Previewing Strained zone (36–65): Cumulative mid-week tension or shorter sleep windows are reducing emotional buffer. Schedule a calming 4-7-8 reset inside Routines.'
             : 'Previewing Burnout Risk zone (66–100): Sustained sympathetic load across multiple days. Reduce non-essential commitments and use 4-7-8 Breathing or Voice Panic Anchor inside Routines.';
 
-    const zoneColor =
+    const zonePalette =
       displayZone === 'Balanced'
-        ? 'var(--q-green-fg)'
+        ? {
+            fg: 'var(--q-green-fg)',
+            bg: 'var(--q-green-bg)',
+            border: 'var(--q-green-border)',
+          }
         : displayZone === 'Strained'
-          ? 'var(--q-yellow-fg)'
-          : 'var(--q-red-fg)';
+          ? {
+              fg: 'var(--q-yellow-fg)',
+              bg: 'var(--q-yellow-bg)',
+              border: 'var(--q-yellow-border)',
+            }
+          : {
+              fg: 'var(--q-red-fg)',
+              bg: 'var(--q-red-bg)',
+              border: 'var(--q-red-border)',
+            };
 
     const needleAngle = (Math.max(0, Math.min(100, displayScore)) / 100) * 180;
     const needleTip = polarToCartesian(GAUGE_CX, GAUGE_CY, GAUGE_RADIUS - 14, needleAngle);
@@ -131,49 +161,60 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
       <section
         aria-labelledby="burnout-gauge-heading"
         data-edge-recede=""
-        className="wb-surface flex h-full min-w-0 flex-col justify-between rounded-2xl p-4 sm:p-5"
+        className="wb-surface flex h-full min-w-0 flex-col justify-between rounded-[24px] p-4 sm:p-5"
       >
         <div className="min-w-0">
-          <div className="flex flex-wrap items-start justify-between gap-2.5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--ink-muted)]">
-                <Sparkles className="h-3.5 w-3.5 shrink-0 text-[var(--bio-mint)]" />
+              <div className="wb-m3-eyebrow flex flex-wrap items-center gap-1.5 text-[var(--ink-muted)]">
+                <Sparkles className="h-3.5 w-3.5 shrink-0 text-[var(--bio-mint)]" aria-hidden="true" />
                 <span>Pattern Insight</span>
                 <span aria-hidden="true">·</span>
                 <span>
-                  {isPlain ? 'Daily Energy & Stress Balance' : 'Autonomic Load Model'}
+                  {isPlain ? 'Energy & Stress' : 'Autonomic Load'}
                 </span>
               </div>
               <h2
                 id="burnout-gauge-heading"
-                className="mt-1 text-base font-semibold text-[var(--ink-primary)]"
+                className="wb-m3-headline mt-1 text-[18px] text-[var(--ink-primary)] sm:text-[19px]"
               >
                 {isPlain ? 'Energy Reserve Gauge' : 'Burnout Resilience Gauge'}
               </h2>
             </div>
 
-            {/* Interactive State-Preview Segmented Selector (320px safe) */}
+            {/* Interactive M3 Expressive Segmented Selector (Pill <-> Squircle morph, 320px safe) */}
             <div
-              className="grid w-full grid-cols-4 items-center gap-1 rounded-xl bg-[var(--surface-subtle)] p-1 sm:flex sm:w-auto sm:flex-wrap"
+              className="grid w-full grid-cols-4 items-center gap-1 rounded-full border border-[var(--border-hairline)] bg-[var(--surface-subtle)] p-1 sm:flex sm:w-auto sm:flex-wrap"
               role="group"
               aria-label="Preview resilience zones"
             >
               {PREVIEW_OPTIONS.map((opt) => {
                 const active = preview === opt.id;
                 return (
-                  <button
+                  <motion.button
                     key={opt.id}
                     type="button"
                     onClick={() => setPreview(opt.id)}
                     aria-pressed={active}
-                    className="min-h-[38px] min-w-0 truncate rounded-lg px-2 text-xs font-semibold transition-colors sm:min-h-[36px] sm:px-2.5"
+                    whileHover={reduceMotion ? undefined : { scale: 1.03 }}
+                    whileTap={
+                      reduceMotion
+                        ? undefined
+                        : { scale: 0.92, borderRadius: m3Shapes.selectedChip }
+                    }
+                    animate={{
+                      borderRadius: active ? '12px' : m3Shapes.pill,
+                    }}
+                    transition={fastSpring}
+                    className="wb-m3-label-strong min-h-[38px] min-w-0 select-none truncate px-2 text-xs transition-colors sm:min-h-[36px] sm:px-3"
                     style={{
-                      backgroundColor: active ? 'var(--surface-card)' : 'transparent',
-                      color: active ? 'var(--ink-primary)' : 'var(--ink-muted)',
+                      backgroundColor: active ? 'var(--accent-primary)' : 'transparent',
+                      color: active ? 'var(--accent-primary-ink)' : 'var(--ink-muted)',
+                      cursor: 'pointer',
                     }}
                   >
                     {opt.label}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -182,20 +223,21 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
           {heartRatePaused && (
             <div
               role="status"
-              className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3 py-2 text-xs text-[var(--ink-secondary)]"
+              className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 py-2 text-xs text-[var(--ink-secondary)]"
             >
               <span>
                 {isPlain ? 'Heart Rate & Heart Rhythm' : 'Heart Rate & HRV'} sensor paused in
                 Devices Settings · Showing saved history
               </span>
               {onOpenWearableSettings && (
-                <button
-                  type="button"
+                <ExpressiveButton
+                  variant="tonal"
+                  size="sm"
                   onClick={onOpenWearableSettings}
-                  className="shrink-0 font-semibold text-[var(--accent-primary)] underline underline-offset-2"
+                  className="wb-m3-label-strong"
                 >
                   Settings
-                </button>
+                </ExpressiveButton>
               )}
             </div>
           )}
@@ -235,21 +277,23 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
                 opacity={displayZone === 'Burnout Risk' ? 1 : 0.32}
               />
 
-              <line
+              <motion.line
                 x1={GAUGE_CX}
                 y1={GAUGE_CY}
-                x2={needleTip.x}
-                y2={needleTip.y}
+                initial={false}
+                animate={{ x2: needleTip.x, y2: needleTip.y }}
+                transition={spatialSpring}
                 stroke="var(--ink-primary)"
-                strokeWidth="2.5"
+                strokeWidth="2.75"
                 strokeLinecap="round"
               />
-              <circle cx={GAUGE_CX} cy={GAUGE_CY} r="5" fill="var(--ink-primary)" />
+              <circle cx={GAUGE_CX} cy={GAUGE_CY} r="5.5" fill="var(--ink-primary)" />
 
               <text
                 x="14"
                 y="148"
                 fontSize="10"
+                fontWeight="600"
                 fill="var(--chart-axis)"
                 className="tabular-nums"
               >
@@ -260,6 +304,7 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
                 y="18"
                 textAnchor="middle"
                 fontSize="10"
+                fontWeight="600"
                 fill="var(--chart-axis)"
               >
                 Strained
@@ -269,6 +314,7 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
                 y="148"
                 textAnchor="end"
                 fontSize="10"
+                fontWeight="600"
                 fill="var(--chart-axis)"
                 className="tabular-nums"
               >
@@ -276,14 +322,38 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
               </text>
             </svg>
 
-            <div className="-mt-1 text-center" aria-live="polite">
-              <div className="flex items-baseline justify-center gap-1.5">
-                <span className="font-mono-tabular text-3xl font-semibold text-[var(--ink-primary)]">
+            <div className="-mt-1 flex flex-col items-center text-center" aria-live="polite">
+              <div className="flex items-baseline justify-center gap-1">
+                <motion.span
+                  key={`${preview}-${displayScore}`}
+                  initial={reduceMotion ? false : { opacity: 0.45, y: 6, scale: 0.92 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={spatialSpring}
+                  className="wb-m3-metric inline-block text-[40px] text-[var(--ink-primary)] sm:text-[42px]"
+                >
                   {displayScore}
+                </motion.span>
+                <span className="wb-m3-label-strong text-sm text-[var(--ink-muted)] tabular-nums">
+                  /100
                 </span>
-                <span className="font-mono-tabular text-sm text-[var(--ink-muted)]">/100</span>
               </div>
-              <p className="mt-0.5 text-xs font-semibold" style={{ color: zoneColor }}>
+
+              <motion.span
+                key={`${preview}-${displayZone}`}
+                initial={reduceMotion ? false : { opacity: 0.5, scale: 0.94 }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  borderRadius: preview !== 'live' ? '11px' : m3Shapes.pill,
+                }}
+                transition={fastSpring}
+                className="wb-m3-label-strong mt-2 inline-flex items-center px-3 py-1 text-xs"
+                style={{
+                  backgroundColor: zonePalette.bg,
+                  color: zonePalette.fg,
+                  border: `1px solid ${zonePalette.border}`,
+                }}
+              >
                 {displayZone}
                 {a11y.patternAssist &&
                   (displayZone === 'Balanced'
@@ -291,63 +361,87 @@ export const BurnoutGauge: React.FC<BurnoutGaugeProps> = React.memo(
                     : displayZone === 'Strained'
                       ? ' · Moderate'
                       : ' · High Load')}
-                {preview !== 'live' && ' (Preview)'}
-              </p>
+                {preview !== 'live' && ' · Preview'}
+              </motion.span>
             </div>
           </div>
 
           {/* Biometric Summary Strip (Live telemetry in Live mode; zone benchmarks in Preview mode) */}
-          <dl className="mt-4 grid grid-cols-3 divide-x divide-[var(--border-hairline)] rounded-xl bg-[var(--surface-subtle)] py-2.5 text-center">
+          <dl className="mt-4 grid grid-cols-3 divide-x divide-[var(--border-hairline)] rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] py-3 text-center">
             <div className="min-w-0 px-1.5 sm:px-2">
-              <dt className="truncate text-[11px] text-[var(--ink-muted)]">
+              <dt className="wb-m3-eyebrow truncate text-[10px] text-[var(--ink-muted)]">
                 {preview === 'live' ? 'Avg Sleep' : 'Target Sleep'}
               </dt>
-              <dd className="mt-0.5 font-mono-tabular text-sm font-semibold text-[var(--ink-primary)]">
+              <motion.dd
+                key={`sleep-${preview}-${biometricSummary.sleep}`}
+                initial={reduceMotion ? false : { opacity: 0.4, y: 3 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={effectsSpring}
+                className="wb-m3-metric mt-1.5 text-[15px] text-[var(--ink-primary)]"
+              >
                 {biometricSummary.sleep}
-              </dd>
+              </motion.dd>
             </div>
             <div className="min-w-0 px-1.5 sm:px-2">
-              <dt className="truncate text-[11px] text-[var(--ink-muted)]">
-                {isPlain ? 'Resting Heart Rate' : 'Resting HR'}
+              <dt className="wb-m3-eyebrow truncate text-[10px] text-[var(--ink-muted)]">
+                {isPlain ? 'Resting HR' : 'Resting HR'}
                 {preview === 'live' && heartRatePaused ? ' · Saved' : ''}
               </dt>
-              <dd className="mt-0.5 font-mono-tabular text-sm font-semibold text-[var(--ink-primary)]">
+              <motion.dd
+                key={`rhr-${preview}-${biometricSummary.rhrShort}`}
+                initial={reduceMotion ? false : { opacity: 0.4, y: 3 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={effectsSpring}
+                className="wb-m3-metric mt-1.5 text-[15px] text-[var(--ink-primary)]"
+              >
                 {biometricSummary.rhrShort}
-              </dd>
+              </motion.dd>
             </div>
             <div className="min-w-0 px-1.5 sm:px-2">
-              <dt className="truncate text-[11px] text-[var(--ink-muted)]">Low-energy</dt>
-              <dd className="mt-0.5 font-mono-tabular text-sm font-semibold text-[var(--ink-primary)]">
+              <dt className="wb-m3-eyebrow truncate text-[10px] text-[var(--ink-muted)]">
+                Low-energy
+              </dt>
+              <motion.dd
+                key={`low-${preview}-${biometricSummary.lowEnergy}`}
+                initial={reduceMotion ? false : { opacity: 0.4, y: 3 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={effectsSpring}
+                className="wb-m3-metric mt-1.5 text-[15px] text-[var(--ink-primary)]"
+              >
                 {biometricSummary.lowEnergy}
-              </dd>
+              </motion.dd>
             </div>
           </dl>
 
-          <p className="wb-prose mt-3.5 text-xs leading-relaxed text-[var(--ink-secondary)]">
+          <motion.p
+            key={`guidance-${preview}-${displayZone}`}
+            initial={reduceMotion ? false : { opacity: 0.45, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={effectsSpring}
+            className="wb-prose mt-3.5 text-[12.5px] leading-relaxed text-[var(--ink-secondary)]"
+          >
             {displayGuidance}
-          </p>
+          </motion.p>
         </div>
 
-        {/* Routine Action: Navigate to Routines */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border-hairline)] pt-3.5">
-          <span className="text-xs text-[var(--ink-muted)]">
+        {/* Routine Action: Navigate to Routines (M3 Expressive Filled Pill -> Squircle) */}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5 border-t border-[var(--border-hairline)] pt-3.5">
+          <span className="wb-m3-eyebrow text-[10px] text-[var(--ink-muted)]">
             {isPlain ? 'Guided calming exercises' : 'Vagal recovery modules'}
           </span>
-          <button
-            type="button"
+          <ExpressiveButton
+            variant="filled"
+            size="md"
             onClick={onLaunchBreathingReset}
-            className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl px-4 text-xs font-semibold transition-colors"
-            style={{
-              backgroundColor: 'var(--accent-primary)',
-              color: 'var(--accent-primary-ink)',
-            }}
+            leadingIcon={<Wind className="h-3.5 w-3.5" />}
+            className="wb-m3-label-strong"
           >
-            <Wind className="h-3.5 w-3.5" />
-            <span>{isPlain ? 'Open Routines' : 'Start Reset in Routines'}</span>
-          </button>
+            {isPlain ? 'Open Routines' : 'Start Reset in Routines'}
+          </ExpressiveButton>
         </div>
       </section>
     );
   }
 );
 BurnoutGauge.displayName = 'BurnoutGauge';
+

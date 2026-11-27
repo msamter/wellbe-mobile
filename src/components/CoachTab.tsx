@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   AlertCircle,
   MessageSquare,
@@ -16,6 +17,12 @@ import { RESET_PROTOCOLS } from '../data/wellbeData';
 import { TrendsAnalytics } from '../utils/analytics';
 import { useDragToScroll } from '../hooks/useDragToScroll';
 import { speakCalmFemaleVoice, stopCalmVoice } from '../utils/voiceover';
+import { getM3Spring, m3Shapes } from '../design/m3ExpressiveTokens';
+import {
+  ExpressiveMorphLoader,
+  ExpressiveSkeletonBone,
+} from './ExpressiveLoaders';
+import { ExpressiveButton } from './ExpressiveControls';
 
 interface CoachTabProps {
   isActive?: boolean;
@@ -53,14 +60,24 @@ const GROUNDING_PROTOCOL = RESET_PROTOCOLS[2];
 interface CoachMessageRowProps {
   msg: CoachMessage;
   isSpeaking: boolean;
+  reduceMotion?: boolean;
+  calmMode?: boolean;
   onToggleSpeak: (msg: CoachMessage) => void;
 }
 
 const CoachMessageRow: React.FC<CoachMessageRowProps> = React.memo(
-  ({ msg, isSpeaking, onToggleSpeak }) => {
+  ({ msg, isSpeaking, reduceMotion = false, calmMode = false, onToggleSpeak }) => {
     const isUser = msg.role === 'user';
+    const entranceTransition = getM3Spring('defaultSpatial', {
+      reduceMotion,
+      calmMode,
+    });
     return (
-      <div
+      <motion.div
+        layout={false}
+        initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={entranceTransition}
         role={msg.isError ? 'alert' : undefined}
         className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
       >
@@ -127,7 +144,7 @@ const CoachMessageRow: React.FC<CoachMessageRowProps> = React.memo(
             </p>
           )}
         </div>
-      </div>
+      </motion.div>
     );
   }
 );
@@ -467,36 +484,36 @@ export const CoachTab: React.FC<CoachTabProps> = React.memo(
 
           <div className="flex shrink-0 items-center gap-2">
             {/* Full-Size Mobile/Tablet Context Switcher */}
-            <button
-              type="button"
+            <ExpressiveButton
+              variant="outlined"
+              size="md"
+              selected={mobileView === 'context'}
               onClick={() =>
                 setMobileView((v) => (v === 'chat' ? 'context' : 'chat'))
               }
               aria-pressed={mobileView === 'context'}
-              className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-card)] px-4 text-sm font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)] lg:hidden"
-            >
-              {mobileView === 'chat' ? (
-                <>
+              leadingIcon={
+                mobileView === 'chat' ? (
                   <Watch className="h-4 w-4 shrink-0 text-[var(--bio-mint)]" />
-                  <span>Context</span>
-                </>
-              ) : (
-                <>
+                ) : (
                   <MessageSquare className="h-4 w-4 shrink-0 text-[var(--accent-primary)]" />
-                  <span>Chat</span>
-                </>
-              )}
-            </button>
+                )
+              }
+              className="lg:hidden"
+            >
+              {mobileView === 'chat' ? 'Context' : 'Chat'}
+            </ExpressiveButton>
 
             {messages.length > 0 && (
-              <button
-                type="button"
+              <ExpressiveButton
+                variant="outlined"
+                size="md"
                 onClick={handleClearThread}
-                className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-card)] px-3.5 text-sm font-semibold text-[var(--ink-secondary)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
+                leadingIcon={<Trash2 className="h-4 w-4 shrink-0" />}
+                className="text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
               >
-                <Trash2 className="h-4 w-4 shrink-0" />
-                <span>New Thread</span>
-              </button>
+                New Thread
+              </ExpressiveButton>
             )}
           </div>
         </section>
@@ -553,16 +570,17 @@ export const CoachTab: React.FC<CoachTabProps> = React.memo(
                       ))}
 
                       <div className="pt-0.5 text-center">
-                        <button
-                          type="button"
+                        <ExpressiveButton
+                          variant="text"
+                          size="sm"
                           onClick={() =>
                             setPromptSetIdx((i) => (i + 1) % PROMPT_SETS.length)
                           }
-                          className="inline-flex min-h-[34px] items-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-[var(--accent-primary)] hover:bg-[var(--accent-soft)]"
+                          leadingIcon={<RefreshCw className="h-3.5 w-3.5" />}
+                          className="hover:bg-[var(--accent-soft)]"
                         >
-                          <RefreshCw className="h-3.5 w-3.5" />
-                          <span>Show 3 other suggestions</span>
-                        </button>
+                          Show 3 other suggestions
+                        </ExpressiveButton>
                       </div>
                     </div>
                   </div>
@@ -573,18 +591,54 @@ export const CoachTab: React.FC<CoachTabProps> = React.memo(
                     key={msg.id}
                     msg={msg}
                     isSpeaking={speakingMsgId === msg.id}
+                    reduceMotion={settings.reduceMotion}
+                    calmMode={settings.calmMode}
                     onToggleSpeak={handleToggleSpeakMessage}
                   />
                 ))
               )}
 
-              {isSending && (
-                <div className="flex items-start" role="status" aria-live="polite">
-                  <div className="rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 py-2.5 text-xs text-[var(--ink-muted)]">
-                    Reviewing your 7-day logs and biometric baseline…
-                  </div>
-                </div>
-              )}
+              <AnimatePresence>
+                {isSending && (
+                  <motion.div
+                    key="coach-thinking"
+                    initial={settings.reduceMotion ? false : { opacity: 0, y: 10, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={settings.reduceMotion ? undefined : { opacity: 0, scale: 0.96 }}
+                    transition={getM3Spring('defaultEffects', {
+                      reduceMotion: settings.reduceMotion,
+                      calmMode: settings.calmMode,
+                    })}
+                    className="flex items-start"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    <div
+                      className="w-full max-w-[85%] space-y-2.5 border border-[var(--border-hairline)] bg-[var(--surface-subtle)] p-3.5"
+                      style={{ borderRadius: m3Shapes.large }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <ExpressiveMorphLoader
+                          size={34}
+                          label="WELLBE+ Coach is reflecting"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-[var(--ink-primary)]">
+                            Reviewing your 7-day logs &amp; biometrics
+                          </p>
+                          <p className="text-[11px] text-[var(--ink-muted)]">
+                            Drafting a grounded reflection…
+                          </p>
+                        </div>
+                      </div>
+                      <div className="space-y-1.5 pl-1">
+                        <ExpressiveSkeletonBone width="92%" height={10} />
+                        <ExpressiveSkeletonBone width="68%" height={10} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Pinned Message Composer (always visible inside the single viewport) */}
@@ -604,19 +658,16 @@ export const CoachTab: React.FC<CoachTabProps> = React.memo(
                 placeholder="Ask about moods, sleep, or a quick reset..."
                 className="min-h-[42px] min-w-0 flex-1 rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-muted)]"
               />
-              <button
+              <ExpressiveButton
                 type="submit"
+                variant="filled"
+                size="md"
                 disabled={isSending || !input.trim()}
-                className="inline-flex min-h-[42px] min-w-[42px] shrink-0 items-center justify-center gap-1.5 rounded-xl px-3.5 text-xs font-semibold transition-opacity disabled:opacity-45"
-                style={{
-                  backgroundColor: 'var(--accent-primary)',
-                  color: 'var(--accent-primary-ink)',
-                }}
+                leadingIcon={<Send className="h-4 w-4" />}
                 aria-label="Send message to WELLBE+ Coach"
               >
-                <Send className="h-4 w-4" />
                 <span className={settings.plainLanguage ? 'inline' : 'hidden sm:inline'}>Send</span>
-              </button>
+              </ExpressiveButton>
             </form>
           </section>
 

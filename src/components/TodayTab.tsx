@@ -31,6 +31,11 @@ import {
 import { AffectiveGlyph, getQuadrantStyle } from './AffectiveGlyphs';
 import { CompactEmotionMatrix, getEmotionPersonalGlow } from './CompactEmotionMatrix';
 import { cancelActiveDragScroll, useDragToScroll } from '../hooks/useDragToScroll';
+import {
+  ExpressiveButton,
+  ExpressiveChip,
+  ExpressiveIconButton,
+} from './ExpressiveControls';
 
 export interface QuickLogResult {
   entry: MoodEntry | null;
@@ -126,21 +131,29 @@ const PredictiveNudgesCard: React.FC<PredictiveNudgesCardProps> = React.memo(
           </h2>
         </div>
 
-        {/* Do Not Disturb Toggle (≥44px hit target) */}
-        <button
-          type="button"
+        {/* Do Not Disturb Toggle (≥44px hit target, M3 Expressive Pill -> Squircle) */}
+        <ExpressiveButton
+          variant="outlined"
+          size="md"
+          selected={dndEnabled}
           role="switch"
           aria-checked={dndEnabled}
           onClick={onToggleDnd}
-          className="flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
+          leadingIcon={
+            dndEnabled ? (
+              <BellOff className="h-3.5 w-3.5 text-[var(--q-red-fg)]" />
+            ) : (
+              <Bell className="h-3.5 w-3.5 text-[var(--accent-primary)]" />
+            )
+          }
+          style={{
+            backgroundColor: dndEnabled ? 'var(--q-red-bg)' : 'var(--surface-subtle)',
+            color: dndEnabled ? 'var(--q-red-fg)' : 'var(--ink-primary)',
+            border: `1px solid ${dndEnabled ? 'var(--q-red-border)' : 'var(--border-hairline)'}`,
+          }}
         >
-          {dndEnabled ? (
-            <BellOff className="h-3.5 w-3.5 text-[var(--q-red-fg)]" />
-          ) : (
-            <Bell className="h-3.5 w-3.5 text-[var(--accent-primary)]" />
-          )}
-          <span>{dndEnabled ? 'DND On' : 'Do Not Disturb'}</span>
-        </button>
+          {dndEnabled ? 'DND On' : 'Do Not Disturb'}
+        </ExpressiveButton>
       </div>
 
       {nextNudge && (
@@ -163,14 +176,15 @@ const PredictiveNudgesCard: React.FC<PredictiveNudgesCardProps> = React.memo(
         <span className="text-xs text-[var(--ink-muted)]">
           Computed from local check-in history
         </span>
-        <button
-          type="button"
+        <ExpressiveButton
+          variant="text"
+          size="md"
           onClick={onOpenManageNudges}
-          className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-semibold text-[var(--accent-primary)] hover:bg-[var(--accent-soft)]"
+          leadingIcon={<SlidersHorizontal className="h-3.5 w-3.5" />}
+          className="hover:bg-[var(--accent-soft)]"
         >
-          <SlidersHorizontal className="h-3.5 w-3.5" />
-          <span>Manage &amp; Test</span>
-        </button>
+          Manage &amp; Test
+        </ExpressiveButton>
       </div>
     </section>
   )
@@ -240,22 +254,22 @@ const QuickResetDeckCarousel: React.FC<QuickResetDeckCarouselProps> = React.memo
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
-            <button
-              type="button"
+            <ExpressiveIconButton
+              variant="tonal"
+              size={44}
               onClick={handlePrevDeck}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
-              aria-label="Previous quick reset protocol"
+              ariaLabel="Previous quick reset protocol"
             >
               <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
+            </ExpressiveIconButton>
+            <ExpressiveIconButton
+              variant="tonal"
+              size={44}
               onClick={handleNextDeck}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
-              aria-label="Next quick reset protocol"
+              ariaLabel="Next quick reset protocol"
             >
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </ExpressiveIconButton>
           </div>
         </div>
 
@@ -279,14 +293,18 @@ const QuickResetDeckCarousel: React.FC<QuickResetDeckCarouselProps> = React.memo
               {activeDeckProtocol.scienceNote}
             </p>
             <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2">
-              <button
-                type="button"
+              <ExpressiveButton
+                variant="outlined"
+                size="md"
                 onClick={() => onLaunchProtocol(activeDeckProtocol)}
-                className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl border border-[var(--border-strong)] bg-[var(--surface-subtle)] px-3.5 text-xs font-semibold text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
+                leadingIcon={<Play className="h-3.5 w-3.5 shrink-0" />}
+                style={{
+                  backgroundColor: 'var(--surface-subtle)',
+                  borderColor: 'var(--border-strong)',
+                }}
               >
-                <Play className="h-3.5 w-3.5 shrink-0" />
-                <span>{activeDeckProtocol.ctaLabel}</span>
-              </button>
+                {activeDeckProtocol.ctaLabel}
+              </ExpressiveButton>
 
               {/* Accessible step indicators with 44px vertical touch target */}
               <div
@@ -381,14 +399,15 @@ const TodayRoutineResetCard: React.FC<TodayRoutineResetCardProps> = React.memo(
             )}
           </p>
         </div>
-        <button
-          type="button"
+        <ExpressiveButton
+          variant="text"
+          size="md"
           onClick={onNavigateRoutines}
-          className="inline-flex min-h-[44px] shrink-0 items-center gap-1 whitespace-nowrap rounded-xl px-3 text-xs font-semibold text-[var(--accent-primary)] hover:bg-[var(--accent-soft)]"
+          trailingIcon={<ArrowRight className="h-3.5 w-3.5" />}
+          className="hover:bg-[var(--accent-soft)]"
         >
-          <span>Routines</span>
-          <ArrowRight className="h-3.5 w-3.5" />
-        </button>
+          Routines
+        </ExpressiveButton>
       </div>
 
       {/* Recommended Reset Spotlight */}
@@ -406,26 +425,23 @@ const TodayRoutineResetCard: React.FC<TodayRoutineResetCardProps> = React.memo(
           {recommendedProtocol.summary}
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-2.5">
-          <button
-            type="button"
+          <ExpressiveButton
+            variant="filled"
+            size="md"
             onClick={() => onLaunchProtocol(recommendedProtocol)}
-            className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-xl px-4 text-xs font-semibold transition-colors"
-            style={{
-              backgroundColor: 'var(--accent-primary)',
-              color: 'var(--accent-primary-ink)',
-            }}
+            leadingIcon={<Play className="h-3.5 w-3.5 fill-current" />}
           >
-            <Play className="h-3.5 w-3.5 fill-current" />
-            <span>{recommendedProtocol.ctaLabel}</span>
-          </button>
-          <button
-            type="button"
+            {recommendedProtocol.ctaLabel}
+          </ExpressiveButton>
+          <ExpressiveButton
+            variant="outlined"
+            size="md"
             onClick={onNavigateRoutines}
-            className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-card)] px-3.5 text-xs font-semibold text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
+            trailingIcon={<ArrowRight className="h-3.5 w-3.5 shrink-0" />}
+            className="text-[var(--ink-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
           >
-            <span>Open Routines</span>
-            <ArrowRight className="h-3.5 w-3.5 shrink-0" />
-          </button>
+            Open Routines
+          </ExpressiveButton>
         </div>
       </div>
 
@@ -543,35 +559,38 @@ const AttachToEntryCard: React.FC<AttachToEntryCardProps> = React.memo(
               </p>
             </div>
           </div>
-          <button
-            type="button"
+          <ExpressiveIconButton
+            variant="standard"
+            size={44}
             onPointerDown={onSaveStart}
             onClick={onDismiss}
-            className="flex min-h-[44px] min-w-[44px] -mr-2 -mt-2 items-center justify-center rounded-xl text-[var(--ink-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
-            aria-label="Dismiss check-in details"
+            className="-mr-2 -mt-2 hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
+            ariaLabel="Dismiss check-in details"
           >
             <X className="h-4 w-4" />
-          </button>
+          </ExpressiveIconButton>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Context tags">
           {CONTEXT_TAGS.map((tag) => {
             const active = draftTags.includes(tag);
             return (
-              <button
+              <ExpressiveChip
                 key={tag}
-                type="button"
+                label={tag}
+                selected={active}
                 onClick={() => handleToggleTag(tag)}
-                aria-pressed={active}
-                className="min-h-[44px] rounded-xl px-3.5 text-xs font-semibold transition-colors"
-                style={{
-                  backgroundColor: active ? 'var(--accent-primary)' : 'var(--surface-card)',
-                  color: active ? 'var(--accent-primary-ink)' : 'var(--ink-secondary)',
-                  border: `1px solid ${active ? 'var(--accent-primary)' : 'var(--border-hairline)'}`,
-                }}
-              >
-                {tag}
-              </button>
+                className="min-h-[40px]"
+                toneStyle={
+                  active
+                    ? {
+                        backgroundColor: 'var(--accent-primary)',
+                        color: 'var(--accent-primary-ink)',
+                        border: '1px solid var(--accent-primary)',
+                      }
+                    : undefined
+                }
+              />
             );
           })}
         </div>
@@ -600,18 +619,14 @@ const AttachToEntryCard: React.FC<AttachToEntryCardProps> = React.memo(
             placeholder="Optional one-line note (e.g., After morning walk or deep focus block)"
             className="min-h-[44px] flex-1 rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-card)] px-3 text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-muted)]"
           />
-          <button
-            type="button"
+          <ExpressiveButton
+            variant="filled"
+            size="md"
             onPointerDown={onSaveStart}
             onClick={handleSave}
-            className="min-h-[44px] shrink-0 whitespace-nowrap rounded-xl px-4 text-xs font-semibold transition-colors"
-            style={{
-              backgroundColor: 'var(--accent-primary)',
-              color: 'var(--accent-primary-ink)',
-            }}
           >
             {savedFeedback ? 'Details Saved' : 'Attach to Entry'}
-          </button>
+          </ExpressiveButton>
         </div>
       </div>
     );
@@ -1453,15 +1468,16 @@ export const TodayTab: React.FC<TodayTabProps> = React.memo(
                 {/* Active Selection Clear */}
                 {selectedEmotionIds.length > 0 && (
                   <div className="flex shrink-0 items-center">
-                    <button
-                      type="button"
+                    <ExpressiveButton
+                      variant="text"
+                      size="sm"
                       data-no-drag-scroll="true"
                       onClick={() => handleRevertSelectionAndCard(false)}
-                      className="-my-2 inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg px-2.5 text-xs font-semibold text-[var(--ink-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
+                      className="-my-1 text-[var(--ink-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink-primary)]"
                       aria-label="Clear selected emotion outline"
                     >
                       Clear
-                    </button>
+                    </ExpressiveButton>
                   </div>
                 )}
               </div>
