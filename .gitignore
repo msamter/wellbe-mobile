@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Ignore temporary AI Studio chat image attachments
+**/aistudio/
+src/assets/aistudio/
+assets/aistudio/
+public/assets/aistudio/
+

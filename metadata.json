@@ -1,0 +1,8 @@
+{
+  "name": "WELLBE+ (3.0)",
+  "description": "Emotional well-being, somatic reset protocols, local mood journal, wearable biometric analytics, and AI wellness coaching.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

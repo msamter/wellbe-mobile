@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/webp" href="/assets/favicon.webp" />
+    <link rel="shortcut icon" type="image/webp" href="/assets/favicon.webp" />
+    <link rel="apple-touch-icon" href="/assets/favicon.webp" />
+    <title>WELLBE+ (3.0) — Emotional Well-Being & Biometric Somatic Reset</title>
+    <meta name="description" content="Emotional well-being, somatic reset protocols, local mood journal, wearable biometric analytics, and AI wellness coaching." />
+    <meta property="og:title" content="WELLBE+ (3.0) — Emotional Well-Being & Biometric Somatic Reset" />
+    <meta property="og:description" content="Emotional well-being, somatic reset protocols, local mood journal, wearable biometric analytics, and AI wellness coaching." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      fetchpriority="high"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Roboto+Flex:opsz,wght@8..144,400..700&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Roboto+Flex:opsz,wght@8..144,400..700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        try {
+          var rawSettings = localStorage.getItem('wellbe_v1_settings');
+          var s = rawSettings ? JSON.parse(rawSettings) : {};
+          var rawA11y = localStorage.getItem('wellbe_a11y_v1');
+          var parsedA11y = rawA11y ? JSON.parse(rawA11y) : null;
+          var a = parsedA11y && typeof parsedA11y === 'object'
+            ? (parsedA11y.prefs && typeof parsedA11y.prefs === 'object' ? parsedA11y.prefs : parsedA11y)
+            : s;
+          var ov = parsedA11y && parsedA11y.userOverrides ? parsedA11y.userOverrides : {};
+          var root = document.documentElement;
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          var prefersContrast = window.matchMedia && window.matchMedia('(prefers-contrast: more)').matches;
+
+          var isDark = s.theme === 'dark' || ((!s.theme || s.theme === 'system') && prefersDark);
+          if (isDark) root.classList.add('dark');
+
+          var hasMotionOv = typeof ov.reduceMotion === 'boolean' ? ov.reduceMotion : typeof a.reduceMotion === 'boolean';
+          var hasContrastOv = typeof ov.highContrast === 'boolean' ? ov.highContrast : typeof a.highContrast === 'boolean';
+
+          var flags = {
+            'calm-mode': Boolean(a.calmMode),
+            'reduce-motion': hasMotionOv && typeof a.reduceMotion === 'boolean' ? a.reduceMotion : prefersReduced,
+            'reduce-transparency': Boolean(a.reduceTransparency),
+            'high-contrast': hasContrastOv && typeof a.highContrast === 'boolean' ? a.highContrast : prefersContrast,
+            'reading-comfort': Boolean(a.readingComfort),
+            'focus-mode': Boolean(a.focusMode),
+            'pattern-assist': Boolean(a.patternAssist),
+            'plain-language': Boolean(a.plainLanguage),
+            'quiet-cues': Boolean(a.quietCues),
+          };
+
+          Object.keys(flags).forEach(function (key) {
+            var val = flags[key];
+            root.setAttribute('data-' + key, String(val));
+            if (val) root.classList.add(key);
+          });
+          if (!flags['reduce-motion']) root.classList.add('allow-motion');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

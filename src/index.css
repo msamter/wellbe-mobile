@@ -1,0 +1,4001 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================================
+   WELLBE+ 2026 Semantic Design Token Sheet — Neuro-Inclusive & WCAG 2.2 AAA
+   - Preserves semantic palette tokens (--palette-chartreuse, --palette-electric-indigo,
+     --palette-soft-lavender, --palette-deep-plum, --palette-near-black, --palette-near-white)
+   - Declarative root [data-*="true"] CSS architecture across all 9 accessibility modes
+   - Full Light Mode & Dark Mode parity across every toggle & combination
+   - Strict Centralized Z-Index Scale + Seam-Free Reduce Transparency Solid Swap
+   ========================================================================== */
+
+:root {
+  /* Core Semantic Palette Foundation */
+  --palette-chartreuse: #EAFF00;
+  --palette-electric-indigo: #3A00E5;
+  --palette-soft-lavender: #BFB2FF;
+  --palette-deep-plum: #1A004D;
+  --palette-near-black: #09001A;
+  --palette-near-white: #FEFEFE;
+
+  /* Fonts */
+  --font-sans: 'Roboto Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Layout & Strict Z-Index Stacking Scale */
+  --top-bar-height: 56px;
+  --z-base: 0;
+  --z-sticky-header: 20;
+  --z-bottom-dock: 30;
+  --z-fab: 40;
+  --z-popover: 45;
+  --z-sheet: 50;
+  --z-modal: 60;
+  --z-command: 70;
+  --z-panic: 80;
+  --z-toast: 90;
+
+  /* 60% Neutral Architectural Canvas (Warm Alabaster / Stone, <4% saturation) */
+  --surface-canvas: #F6F5F1;
+  --surface-card: var(--palette-near-white);
+  --surface-subtle: #EFEDE7;
+  --surface-hover: #E7E4DC;
+  --surface-elevated: var(--palette-near-white);
+  --scrim-bg: rgba(9, 0, 26, 0.48);
+
+  /* Typography & Hairlines — WCAG AA/AAA Verified */
+  --ink-primary: #161916;
+  --ink-secondary: #3E453F;
+  --ink-muted: #555D56;
+  --border-hairline: rgba(22, 25, 22, 0.11);
+  --border-strong: rgba(22, 25, 22, 0.24);
+
+  /* 10% Brand, Highlight & Biometric Accents */
+  --accent-primary: #1B544A;
+  --accent-primary-hover: #14423A;
+  --accent-primary-ink: var(--palette-near-white);
+  --accent-soft: #E3F0EC;
+  --accent-highlight: var(--palette-chartreuse);
+  --accent-highlight-ink: var(--palette-near-black);
+  --accent-highlight-border: rgba(26, 0, 77, 0.22);
+  --settings-tab-active-bg: var(--palette-electric-indigo);
+  --settings-tab-active-fg: var(--palette-near-white);
+  --settings-tab-active-border: var(--palette-electric-indigo);
+  --brand-action-bg: var(--palette-electric-indigo);
+  --brand-action-fg: var(--palette-near-white);
+  --brand-accent-text: var(--palette-electric-indigo);
+  --brand-accent-soft: rgba(58, 0, 229, 0.1);
+  --brand-accent-border: rgba(58, 0, 229, 0.28);
+  --dock-rail-bg: #F1EFE9;
+  --dock-divider: rgba(22, 25, 22, 0.12);
+  --dock-tile-bg: rgba(254, 254, 254, 0.72);
+  --dock-tile-border: rgba(22, 25, 22, 0.09);
+  --dock-tile-ink: var(--ink-secondary);
+  --dock-active-bg: color-mix(in srgb, var(--palette-soft-lavender) 24%, var(--palette-near-white));
+  --dock-active-border: var(--palette-electric-indigo);
+  --dock-active-ink: var(--palette-deep-plum);
+  --dock-active-indicator: var(--palette-electric-indigo);
+  --dock-active-shadow: 0 6px 16px -8px rgba(58, 0, 229, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --bento-bg: var(--surface-subtle);
+  --bento-border: var(--border-hairline);
+  --bento-shadow: 0 1px 2px rgba(22, 25, 22, 0.04);
+  --bento-open-bg: var(--palette-near-white);
+  --bento-open-header-bg: rgba(191, 178, 255, 0.14);
+  --bento-open-border: rgba(58, 0, 229, 0.48);
+  --bento-open-shadow: 0 10px 24px -14px rgba(58, 0, 229, 0.2), 0 1px 3px rgba(22, 25, 22, 0.06);
+  --bento-divider: rgba(58, 0, 229, 0.14);
+  --bento-pill-bg: var(--palette-near-white);
+  --bento-pill-border: rgba(22, 25, 22, 0.13);
+  --bento-pill-fg: var(--ink-secondary);
+  --bento-pill-accent-bg: rgba(58, 0, 229, 0.09);
+  --bento-pill-accent-border: rgba(58, 0, 229, 0.28);
+  --bento-pill-accent-fg: var(--palette-electric-indigo);
+  --support-banner-bg: color-mix(in srgb, var(--palette-soft-lavender) 18%, var(--palette-near-white));
+  --support-banner-border: rgba(58, 0, 229, 0.24);
+  --support-banner-icon-bg: color-mix(in srgb, var(--palette-soft-lavender) 38%, var(--palette-near-white));
+  --support-banner-icon-fg: var(--palette-deep-plum);
+  --support-cta-bg: var(--palette-electric-indigo);
+  --support-cta-fg: var(--palette-near-white);
+  --support-secondary-bg: var(--palette-near-white);
+  --support-secondary-border: rgba(58, 0, 229, 0.28);
+  --support-secondary-fg: var(--palette-deep-plum);
+  --bio-mint: #0F7A5D;
+  --bio-mint-soft: rgba(15, 122, 93, 0.13);
+  --bio-mint-ring: rgba(15, 122, 93, 0.62);
+  --switch-thumb: var(--palette-near-white);
+
+  /* 4 Emotional Quadrants — Refined Semantics, ≥ 5.5:1 Text Contrast */
+  --q-yellow-bg: #FBF4DF;
+  --q-yellow-fg: #614407;
+  --q-yellow-border: rgba(161, 115, 15, 0.34);
+  --q-yellow-solid: #B88312;
+  --q-yellow-ink: #1A1403;
+
+  --q-green-bg: #E7F3EC;
+  --q-green-fg: #174B33;
+  --q-green-border: rgba(39, 117, 79, 0.32);
+  --q-green-solid: #1E6B4A;
+  --q-green-ink: var(--palette-near-white);
+
+  --q-blue-bg: #E8EFF7;
+  --q-blue-fg: #1F4164;
+  --q-blue-border: rgba(54, 100, 148, 0.32);
+  --q-blue-solid: #325F8C;
+  --q-blue-ink: var(--palette-near-white);
+
+  --q-red-bg: #F9EAE6;
+  --q-red-fg: #722719;
+  --q-red-border: rgba(173, 68, 49, 0.34);
+  --q-red-solid: #A63A28;
+  --q-red-ink: var(--palette-near-white);
+
+  --q-balanced-bg: #ECECE5;
+  --q-balanced-fg: #3C433D;
+  --q-balanced-border: rgba(60, 67, 61, 0.26);
+  --q-balanced-solid: #5F6B62;
+  --q-balanced-ink: var(--palette-near-white);
+
+  /* Restrained Liquid Glass Tokens (Nav, FAB, Sheets, Command Bar, Panic Anchor ONLY) */
+  --glass-bg: rgba(254, 254, 254, 0.86);
+  --glass-bg-strong: rgba(254, 254, 254, 0.94);
+  --glass-border: rgba(22, 25, 22, 0.13);
+  --glass-specular: rgba(255, 255, 255, 0.72);
+  --glass-shadow: 0 12px 28px -12px rgba(22, 25, 22, 0.16), 0 1px 2px rgba(22, 25, 22, 0.06);
+  --glass-blur: 14px;
+
+  /* Focus Ring — ≥ 3:1 Non-Text Contrast */
+  --focus-ring: #1B544A;
+  --focus-ring-width: 2.5px;
+
+  /* Elevation & Motion */
+  --shadow-card: 0 1px 2px rgba(22, 25, 22, 0.05);
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --motion-curve: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Chart Gridlines & Axis */
+  --chart-grid: rgba(22, 25, 22, 0.09);
+  --chart-axis: #555D56;
+
+  /* Spacing cadence (widened gently in Calm Mode) */
+  --wb-section-gap: 1.5rem;
+}
+
+.dark {
+  /* Deep Obsidian-Slate Canvas (<4% cool tint) */
+  --surface-canvas: #0D1110;
+  --surface-card: #151B19;
+  --surface-subtle: #1D2522;
+  --surface-hover: #26302D;
+  --surface-elevated: #1B2220;
+  --scrim-bg: rgba(9, 0, 26, 0.68);
+
+  /* Dark Mode Typography — WCAG AA/AAA Verified */
+  --ink-primary: #F2F5F2;
+  --ink-secondary: #C5CFC8;
+  --ink-muted: #9BA89F;
+  --border-hairline: rgba(254, 254, 254, 0.08);
+  --border-strong: rgba(254, 254, 254, 0.16);
+
+  --accent-primary: #5EC7A7;
+  --accent-primary-hover: #73D4B7;
+  --accent-primary-ink: #061812;
+  --accent-soft: rgba(94, 199, 167, 0.15);
+  --accent-highlight: var(--palette-chartreuse);
+  --accent-highlight-ink: var(--palette-near-black);
+  --accent-highlight-border: rgba(234, 255, 0, 0.4);
+  --settings-tab-active-bg: var(--palette-chartreuse);
+  --settings-tab-active-fg: var(--palette-near-black);
+  --settings-tab-active-border: var(--palette-chartreuse);
+  --brand-action-bg: var(--palette-chartreuse);
+  --brand-action-fg: var(--palette-near-black);
+  --brand-accent-text: var(--palette-soft-lavender);
+  --brand-accent-soft: rgba(191, 178, 255, 0.15);
+  --brand-accent-border: rgba(191, 178, 255, 0.34);
+  --dock-rail-bg: #101513;
+  --dock-divider: rgba(254, 254, 254, 0.09);
+  --dock-tile-bg: rgba(254, 254, 254, 0.03);
+  --dock-tile-border: rgba(254, 254, 254, 0.08);
+  --dock-tile-ink: var(--ink-muted);
+  --dock-active-bg: linear-gradient(155deg, rgba(58, 0, 229, 0.28) 0%, rgba(26, 0, 77, 0.56) 100%);
+  --dock-active-border: rgba(191, 178, 255, 0.48);
+  --dock-active-ink: var(--palette-near-white);
+  --dock-active-indicator: var(--palette-chartreuse);
+  --dock-active-shadow: inset 0 1px 0 rgba(191, 178, 255, 0.18);
+  --bento-bg: var(--surface-subtle);
+  --bento-border: rgba(254, 254, 254, 0.08);
+  --bento-shadow: none;
+  --bento-open-bg: color-mix(in srgb, var(--palette-deep-plum) 28%, var(--surface-card));
+  --bento-open-header-bg: rgba(26, 0, 77, 0.28);
+  --bento-open-border: rgba(191, 178, 255, 0.34);
+  --bento-open-shadow: 0 0 0 1px rgba(191, 178, 255, 0.12);
+  --bento-divider: rgba(191, 178, 255, 0.16);
+  --bento-pill-bg: rgba(254, 254, 254, 0.04);
+  --bento-pill-border: rgba(254, 254, 254, 0.10);
+  --bento-pill-fg: var(--ink-secondary);
+  --bento-pill-accent-bg: rgba(191, 178, 255, 0.14);
+  --bento-pill-accent-border: rgba(191, 178, 255, 0.32);
+  --bento-pill-accent-fg: var(--palette-soft-lavender);
+  --support-banner-bg: linear-gradient(155deg, rgba(58, 0, 229, 0.20) 0%, rgba(26, 0, 77, 0.50) 100%);
+  --support-banner-border: rgba(191, 178, 255, 0.28);
+  --support-banner-icon-bg: rgba(191, 178, 255, 0.16);
+  --support-banner-icon-fg: var(--palette-soft-lavender);
+  --support-cta-bg: var(--palette-soft-lavender);
+  --support-cta-fg: var(--palette-near-black);
+  --support-secondary-bg: rgba(26, 0, 77, 0.42);
+  --support-secondary-border: rgba(191, 178, 255, 0.34);
+  --support-secondary-fg: var(--palette-soft-lavender);
+  --bio-mint: #5CE0B8;
+  --bio-mint-soft: rgba(92, 224, 184, 0.15);
+  --bio-mint-ring: rgba(92, 224, 184, 0.78);
+  --switch-thumb: #071914;
+
+  /* Dark Mode Quadrant Tints (≥ 5.8:1 Text Contrast & High-Contrast Solid Ink Pairings) */
+  --q-yellow-bg: rgba(217, 165, 45, 0.17);
+  --q-yellow-fg: #F7DA88;
+  --q-yellow-border: rgba(247, 218, 136, 0.34);
+  --q-yellow-solid: #E4B547;
+  --q-yellow-ink: #1C1402;
+
+  --q-green-bg: rgba(65, 163, 118, 0.18);
+  --q-green-fg: #9BE8C1;
+  --q-green-border: rgba(155, 232, 193, 0.34);
+  --q-green-solid: #55C48E;
+  --q-green-ink: #061D12;
+
+  --q-blue-bg: rgba(94, 146, 198, 0.18);
+  --q-blue-fg: #AED0F5;
+  --q-blue-border: rgba(174, 208, 245, 0.34);
+  --q-blue-solid: #73AAE0;
+  --q-blue-ink: #07182B;
+
+  --q-red-bg: rgba(212, 102, 82, 0.19);
+  --q-red-fg: #F7B3A6;
+  --q-red-border: rgba(247, 179, 166, 0.36);
+  --q-red-solid: #EC8B79;
+  --q-red-ink: #240704;
+
+  --q-balanced-bg: rgba(154, 166, 158, 0.16);
+  --q-balanced-fg: #D1DAD4;
+  --q-balanced-border: rgba(209, 218, 212, 0.28);
+  --q-balanced-solid: #97A69C;
+  --q-balanced-ink: #0C120F;
+
+  --glass-bg: rgba(21, 27, 25, 0.90);
+  --glass-bg-strong: rgba(21, 27, 25, 0.97);
+  --glass-border: rgba(254, 254, 254, 0.10);
+  --glass-specular: rgba(254, 254, 254, 0.05);
+  --glass-shadow: 0 1px 0 rgba(0, 0, 0, 0.32);
+
+  --focus-ring: #F2F5F2;
+  --shadow-card: none;
+  --chart-grid: rgba(254, 254, 254, 0.09);
+  --chart-axis: #A5B3AA;
+}
+
+/* ==========================================================================
+   1. Low-Stimulus / Calm Mode (data-calm-mode="true")
+   - Remaps high-arousal --palette-chartreuse highlights to muted
+     --palette-electric-indigo (Light) or --palette-soft-lavender (Dark)
+   - Gently desaturates 4×4 Emotion Grid & 7×4 D3 Heatmap while preserving contrast
+   - Widens vertical spacing between cards to reduce visual crowding
+   ========================================================================== */
+html[data-calm-mode="true"] {
+  --accent-primary: #3D3578;
+  --accent-primary-hover: #2E2761;
+  --accent-primary-ink: var(--palette-near-white);
+  --accent-soft: #EDEAF9;
+  --accent-highlight: color-mix(in srgb, var(--palette-electric-indigo) 14%, var(--palette-near-white));
+  --accent-highlight-ink: var(--palette-deep-plum);
+  --accent-highlight-border: rgba(58, 0, 229, 0.26);
+  --settings-tab-active-bg: #3D3578;
+  --settings-tab-active-fg: var(--palette-near-white);
+  --settings-tab-active-border: #3D3578;
+  --brand-action-bg: #3D3578;
+  --brand-action-fg: var(--palette-near-white);
+  --brand-accent-text: #3D3578;
+  --brand-accent-soft: rgba(61, 53, 120, 0.1);
+  --brand-accent-border: rgba(61, 53, 120, 0.28);
+  --dock-active-bg: color-mix(in srgb, var(--palette-soft-lavender) 20%, var(--palette-near-white));
+  --dock-active-border: #3D3578;
+  --dock-active-ink: var(--palette-deep-plum);
+  --dock-active-indicator: #3D3578;
+  --bento-open-header-bg: rgba(191, 178, 255, 0.11);
+  --bento-open-border: rgba(61, 53, 120, 0.42);
+  --bento-open-shadow: 0 6px 16px -12px rgba(61, 53, 120, 0.16);
+  --bento-divider: rgba(61, 53, 120, 0.14);
+  --bento-pill-accent-bg: rgba(61, 53, 120, 0.09);
+  --bento-pill-accent-border: rgba(61, 53, 120, 0.26);
+  --bento-pill-accent-fg: #3D3578;
+  --support-banner-bg: color-mix(in srgb, var(--palette-soft-lavender) 14%, var(--palette-near-white));
+  --support-banner-border: rgba(61, 53, 120, 0.26);
+  --support-banner-icon-bg: color-mix(in srgb, var(--palette-soft-lavender) 28%, var(--palette-near-white));
+  --support-banner-icon-fg: var(--palette-deep-plum);
+  --support-cta-bg: #3D3578;
+  --support-cta-fg: var(--palette-near-white);
+  --support-secondary-bg: var(--palette-near-white);
+  --support-secondary-border: rgba(61, 53, 120, 0.28);
+  --support-secondary-fg: var(--palette-deep-plum);
+  --bio-mint: #2D685A;
+  --q-yellow-bg: #F6F2E8;
+  --q-yellow-fg: #584010;
+  --q-yellow-solid: #9A7830;
+  --q-green-bg: #EBF1ED;
+  --q-green-fg: #1D4A36;
+  --q-green-solid: #376E57;
+  --q-blue-bg: #ECEFF4;
+  --q-blue-fg: #24405E;
+  --q-blue-solid: #476887;
+  --q-red-bg: #F4ECEA;
+  --q-red-fg: #6B2D21;
+  --q-red-solid: #914B3E;
+  --wb-section-gap: 2rem;
+}
+
+html.dark[data-calm-mode="true"] {
+  --accent-primary: var(--palette-soft-lavender);
+  --accent-primary-hover: #D2C9FF;
+  --accent-primary-ink: var(--palette-near-black);
+  --accent-soft: rgba(191, 178, 255, 0.16);
+  --accent-highlight: rgba(191, 178, 255, 0.22);
+  --accent-highlight-ink: var(--palette-soft-lavender);
+  --accent-highlight-border: rgba(191, 178, 255, 0.42);
+  --settings-tab-active-bg: var(--palette-soft-lavender);
+  --settings-tab-active-fg: var(--palette-deep-plum);
+  --settings-tab-active-border: var(--palette-soft-lavender);
+  --brand-action-bg: var(--palette-soft-lavender);
+  --brand-action-fg: var(--palette-near-black);
+  --brand-accent-text: var(--palette-soft-lavender);
+  --brand-accent-soft: rgba(191, 178, 255, 0.14);
+  --brand-accent-border: rgba(191, 178, 255, 0.34);
+  --dock-active-bg: rgba(191, 178, 255, 0.14);
+  --dock-active-border: rgba(191, 178, 255, 0.44);
+  --dock-active-ink: var(--palette-near-white);
+  --dock-active-indicator: var(--palette-soft-lavender);
+  --bento-open-bg: color-mix(in srgb, var(--palette-deep-plum) 24%, var(--surface-card));
+  --bento-open-header-bg: rgba(191, 178, 255, 0.08);
+  --bento-open-border: rgba(191, 178, 255, 0.44);
+  --bento-open-shadow: 0 8px 20px -14px rgba(9, 0, 26, 0.55);
+  --bento-divider: rgba(191, 178, 255, 0.18);
+  --bento-pill-accent-bg: rgba(191, 178, 255, 0.13);
+  --bento-pill-accent-border: rgba(191, 178, 255, 0.34);
+  --bento-pill-accent-fg: var(--palette-soft-lavender);
+  --support-banner-bg: rgba(26, 0, 77, 0.36);
+  --support-banner-border: rgba(191, 178, 255, 0.32);
+  --support-banner-icon-bg: rgba(191, 178, 255, 0.16);
+  --support-banner-icon-fg: var(--palette-soft-lavender);
+  --support-cta-bg: var(--palette-soft-lavender);
+  --support-cta-fg: var(--palette-near-black);
+  --support-secondary-bg: rgba(26, 0, 77, 0.38);
+  --support-secondary-border: rgba(191, 178, 255, 0.38);
+  --support-secondary-fg: var(--palette-soft-lavender);
+  --bio-mint: #8CC5B4;
+  --switch-thumb: var(--palette-near-black);
+  --focus-ring: var(--palette-soft-lavender);
+  --q-yellow-bg: rgba(186, 156, 92, 0.14);
+  --q-yellow-fg: #ECDCAA;
+  --q-green-bg: rgba(94, 148, 122, 0.14);
+  --q-green-fg: #B3DEC8;
+  --q-blue-bg: rgba(108, 138, 172, 0.15);
+  --q-blue-fg: #BED4EC;
+  --q-red-bg: rgba(184, 112, 98, 0.15);
+  --q-red-fg: #EBC0B7;
+}
+
+html[data-calm-mode="true"] .wb-calm-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-section-gap);
+}
+
+html[data-calm-mode="true"] .wb-calm-stack > * {
+  margin-top: 0 !important;
+}
+
+/* ==========================================================================
+   2. High-Contrast Mode (data-high-contrast="true")
+   - Strict WCAG AAA contrast (≥ 7:1 body text, ≥ 4.5:1 borders & chart strokes)
+   - Explicit visible borders on cards, tiles, chips & heatmap cells
+   - High-visibility 3px :focus-visible outline
+   ========================================================================== */
+html[data-high-contrast="true"],
+html[data-calm-mode="true"][data-high-contrast="true"] {
+  --border-hairline: rgba(9, 0, 26, 0.56);
+  --border-strong: rgba(9, 0, 26, 0.9);
+  --ink-primary: var(--palette-near-black);
+  --ink-secondary: #120D1F;
+  --ink-muted: #241F33;
+  --surface-canvas: var(--palette-near-white);
+  --surface-card: var(--palette-near-white);
+  --surface-subtle: #F1F1F5;
+  --surface-hover: #E3E2EC;
+  --accent-primary: var(--palette-deep-plum);
+  --accent-primary-hover: var(--palette-near-black);
+  --accent-primary-ink: var(--palette-near-white);
+  --accent-soft: #E9E4FA;
+  --accent-highlight: var(--palette-chartreuse);
+  --accent-highlight-ink: var(--palette-near-black);
+  --accent-highlight-border: var(--palette-near-black);
+  --settings-tab-active-bg: var(--palette-deep-plum);
+  --settings-tab-active-fg: var(--palette-near-white);
+  --settings-tab-active-border: var(--palette-near-black);
+  --brand-action-bg: var(--palette-deep-plum);
+  --brand-action-fg: var(--palette-near-white);
+  --brand-accent-text: var(--palette-deep-plum);
+  --brand-accent-soft: #E9E4FA;
+  --brand-accent-border: var(--palette-deep-plum);
+  --dock-rail-bg: #F3F2F8;
+  --dock-divider: var(--palette-near-black);
+  --dock-tile-bg: var(--palette-near-white);
+  --dock-tile-border: var(--palette-deep-plum);
+  --dock-tile-ink: var(--palette-near-black);
+  --dock-active-bg: var(--palette-deep-plum);
+  --dock-active-border: var(--palette-near-black);
+  --dock-active-ink: var(--palette-near-white);
+  --dock-active-indicator: var(--palette-chartreuse);
+  --dock-active-shadow: none;
+  --bento-bg: var(--surface-subtle);
+  --bento-border: var(--palette-deep-plum);
+  --bento-shadow: none;
+  --bento-open-bg: var(--palette-near-white);
+  --bento-open-header-bg: #ECE7FB;
+  --bento-open-border: var(--palette-deep-plum);
+  --bento-open-shadow: none;
+  --bento-divider: var(--palette-deep-plum);
+  --bento-pill-bg: var(--palette-near-white);
+  --bento-pill-border: var(--palette-near-black);
+  --bento-pill-fg: var(--palette-near-black);
+  --bento-pill-accent-bg: #E9E4FA;
+  --bento-pill-accent-border: var(--palette-deep-plum);
+  --bento-pill-accent-fg: var(--palette-deep-plum);
+  --support-banner-bg: #ECE7FB;
+  --support-banner-border: var(--palette-deep-plum);
+  --support-banner-icon-bg: var(--palette-deep-plum);
+  --support-banner-icon-fg: var(--palette-near-white);
+  --support-cta-bg: var(--palette-deep-plum);
+  --support-cta-fg: var(--palette-near-white);
+  --support-secondary-bg: var(--palette-near-white);
+  --support-secondary-border: var(--palette-deep-plum);
+  --support-secondary-fg: var(--palette-near-black);
+  --bio-mint: #064D39;
+  --switch-thumb: var(--palette-near-white);
+  --focus-ring: var(--palette-near-black);
+  --focus-ring-width: 3px;
+  --q-yellow-bg: #FFF7D4;
+  --q-yellow-fg: #3D2800;
+  --q-yellow-border: #7A5400;
+  --q-yellow-solid: #754F00;
+  --q-yellow-ink: var(--palette-near-white);
+  --q-green-bg: #DFF6E9;
+  --q-green-fg: #07331B;
+  --q-green-border: #135935;
+  --q-green-solid: #0F5230;
+  --q-green-ink: var(--palette-near-white);
+  --q-blue-bg: #E0EEFC;
+  --q-blue-fg: #092544;
+  --q-blue-border: #1A487A;
+  --q-blue-solid: #144070;
+  --q-blue-ink: var(--palette-near-white);
+  --q-red-bg: #FDE3DD;
+  --q-red-fg: #4D0E05;
+  --q-red-border: #8A1E0F;
+  --q-red-solid: #851B0C;
+  --q-red-ink: var(--palette-near-white);
+  --q-balanced-bg: #ECEEE9;
+  --q-balanced-fg: #141715;
+  --q-balanced-border: #404742;
+  --q-balanced-ink: var(--palette-near-white);
+  --chart-grid: rgba(9, 0, 26, 0.28);
+  --chart-axis: var(--palette-near-black);
+}
+
+html.dark[data-high-contrast="true"],
+html.dark[data-calm-mode="true"][data-high-contrast="true"] {
+  --border-hairline: rgba(254, 254, 254, 0.56);
+  --border-strong: rgba(254, 254, 254, 0.92);
+  --ink-primary: var(--palette-near-white);
+  --ink-secondary: #EFF0F7;
+  --ink-muted: #D8DBE8;
+  --surface-canvas: var(--palette-near-black);
+  --surface-card: #120B24;
+  --surface-subtle: #1C1333;
+  --surface-hover: #281C47;
+  --accent-primary: var(--palette-soft-lavender);
+  --accent-primary-hover: #D9D1FF;
+  --accent-primary-ink: var(--palette-near-black);
+  --accent-soft: rgba(191, 178, 255, 0.22);
+  --accent-highlight: var(--palette-chartreuse);
+  --accent-highlight-ink: var(--palette-near-black);
+  --accent-highlight-border: var(--palette-chartreuse);
+  --settings-tab-active-bg: var(--palette-chartreuse);
+  --settings-tab-active-fg: var(--palette-near-black);
+  --settings-tab-active-border: var(--palette-near-white);
+  --brand-action-bg: var(--palette-chartreuse);
+  --brand-action-fg: var(--palette-near-black);
+  --brand-accent-text: var(--palette-soft-lavender);
+  --brand-accent-soft: rgba(191, 178, 255, 0.22);
+  --brand-accent-border: var(--palette-soft-lavender);
+  --dock-rail-bg: #0D071C;
+  --dock-divider: var(--palette-near-white);
+  --dock-tile-bg: #120B24;
+  --dock-tile-border: rgba(254, 254, 254, 0.62);
+  --dock-tile-ink: var(--palette-near-white);
+  --dock-active-bg: var(--palette-deep-plum);
+  --dock-active-border: var(--palette-chartreuse);
+  --dock-active-ink: var(--palette-near-white);
+  --dock-active-indicator: var(--palette-chartreuse);
+  --dock-active-shadow: none;
+  --bento-bg: #18102E;
+  --bento-border: rgba(254, 254, 254, 0.62);
+  --bento-shadow: none;
+  --bento-open-bg: #120B24;
+  --bento-open-header-bg: var(--palette-deep-plum);
+  --bento-open-border: var(--palette-soft-lavender);
+  --bento-open-shadow: none;
+  --bento-divider: rgba(254, 254, 254, 0.56);
+  --bento-pill-bg: #0D071C;
+  --bento-pill-border: rgba(254, 254, 254, 0.72);
+  --bento-pill-fg: var(--palette-near-white);
+  --support-banner-bg: #1A1033;
+  --support-banner-border: var(--palette-soft-lavender);
+  --support-banner-icon-bg: var(--palette-soft-lavender);
+  --support-banner-icon-fg: var(--palette-near-black);
+  --support-cta-bg: var(--palette-soft-lavender);
+  --support-cta-fg: var(--palette-near-black);
+  --support-secondary-bg: #120B24;
+  --support-secondary-border: var(--palette-soft-lavender);
+  --support-secondary-fg: var(--palette-near-white);
+  --bento-pill-accent-bg: var(--palette-deep-plum);
+  --bento-pill-accent-border: var(--palette-soft-lavender);
+  --bento-pill-accent-fg: var(--palette-near-white);
+  --bio-mint: #7AECC6;
+  --switch-thumb: var(--palette-near-black);
+  --focus-ring: var(--palette-chartreuse);
+  --focus-ring-width: 3px;
+  --q-yellow-bg: #362805;
+  --q-yellow-fg: #FFECA8;
+  --q-yellow-border: #F5CE5E;
+  --q-yellow-solid: #F5CE5E;
+  --q-yellow-ink: #1A1200;
+  --q-green-bg: #0A2E1C;
+  --q-green-fg: #B5F7D6;
+  --q-green-border: #5FD99D;
+  --q-green-solid: #6CE0A6;
+  --q-green-ink: #031A0E;
+  --q-blue-bg: #0D253E;
+  --q-blue-fg: #CCE4FF;
+  --q-blue-border: #82BAF2;
+  --q-blue-solid: #8CC0F5;
+  --q-blue-ink: #041528;
+  --q-red-bg: #3D120C;
+  --q-red-fg: #FFCBC0;
+  --q-red-border: #F58F7B;
+  --q-red-solid: #F79A88;
+  --q-red-ink: #240502;
+  --q-balanced-bg: #201B30;
+  --q-balanced-fg: #F4F3FA;
+  --q-balanced-border: #B7B2CC;
+  --q-balanced-ink: var(--palette-near-black);
+  --chart-grid: rgba(254, 254, 254, 0.3);
+  --chart-axis: var(--palette-near-white);
+}
+
+/* Calm + High-Contrast keeps chartreuse muted to high-contrast lavender/plum */
+html[data-calm-mode="true"][data-high-contrast="true"] {
+  --accent-highlight: #E9E4FA;
+  --accent-highlight-ink: var(--palette-deep-plum);
+  --accent-highlight-border: var(--palette-deep-plum);
+}
+
+html.dark[data-calm-mode="true"][data-high-contrast="true"] {
+  --accent-highlight: var(--palette-soft-lavender);
+  --accent-highlight-ink: var(--palette-near-black);
+  --accent-highlight-border: var(--palette-near-white);
+  --settings-tab-active-bg: var(--palette-soft-lavender);
+  --settings-tab-active-fg: var(--palette-near-black);
+  --settings-tab-active-border: var(--palette-near-white);
+  --brand-action-bg: var(--palette-soft-lavender);
+  --brand-action-fg: var(--palette-near-black);
+  --brand-accent-text: var(--palette-soft-lavender);
+  --brand-accent-soft: rgba(191, 178, 255, 0.24);
+  --brand-accent-border: var(--palette-near-white);
+  --dock-active-border: var(--palette-near-white);
+  --dock-active-indicator: var(--palette-soft-lavender);
+  --focus-ring: var(--palette-near-white);
+}
+
+html[data-high-contrast="true"] .wb-surface {
+  border-width: 1.5px;
+  border-color: var(--border-strong);
+}
+
+/* ==========================================================================
+   3. Reduce Transparency Mode (data-reduce-transparency="true")
+   - Replaces all Liquid Glass blurs with solid opaque surfaces + crisp 1px border
+   ========================================================================== */
+html[data-reduce-transparency="true"] {
+  --glass-bg: var(--surface-card);
+  --glass-bg-strong: var(--surface-card);
+  --glass-border: var(--border-strong);
+  --glass-specular: transparent;
+  --glass-shadow: var(--shadow-card);
+  --glass-blur: 0px;
+  --bento-open-bg: var(--palette-near-white);
+  --bento-open-header-bg: #EFEBF9;
+  --bento-open-shadow: none;
+}
+
+html.dark[data-reduce-transparency="true"] {
+  --bento-open-bg: #17132B;
+  --bento-open-header-bg: var(--palette-deep-plum);
+  --bento-open-shadow: none;
+}
+
+html[data-reduce-transparency="true"] .liquid-glass,
+html[data-reduce-transparency="true"] .liquid-glass-strong {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--surface-card) !important;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-card);
+}
+
+html[data-reduce-transparency="true"] .wb-dock-tile-active {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: #EDEAF9 !important;
+  border: 1.5px solid var(--dock-active-border) !important;
+  box-shadow: none !important;
+}
+
+html.dark[data-reduce-transparency="true"] .wb-dock-tile-active {
+  background: var(--palette-deep-plum) !important;
+}
+
+html[data-high-contrast="true"][data-reduce-transparency="true"] .wb-dock-tile-active {
+  background: var(--palette-deep-plum) !important;
+}
+
+/* ==========================================================================
+   4. Reading Comfort & Dyslexia Support (data-reading-comfort="true")
+   - Scales body text 1.10x, line-height 1.65, letter-spacing 0.025em, word-spacing 0.08em
+   - Removes italics, enforces left alignment & 60ch max line length on prose blocks
+   ========================================================================== */
+html[data-reading-comfort="true"] {
+  font-size: 110%;
+}
+
+html[data-reading-comfort="true"] body {
+  line-height: 1.65;
+  letter-spacing: 0.025em;
+  word-spacing: 0.08em;
+}
+
+html[data-reading-comfort="true"] .wb-prose,
+html[data-reading-comfort="true"] em,
+html[data-reading-comfort="true"] i,
+html[data-reading-comfort="true"] blockquote {
+  font-style: normal !important;
+}
+
+html[data-reading-comfort="true"] .wb-prose {
+  max-width: 60ch;
+  text-align: left !important;
+  line-height: 1.68;
+  letter-spacing: 0.025em;
+  word-spacing: 0.08em;
+}
+
+/* ==========================================================================
+   Base Document Styles
+   ========================================================================== */
+html {
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  background-color: var(--surface-canvas);
+  color: var(--ink-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+body {
+  background-color: var(--surface-canvas);
+  color: var(--ink-primary);
+  min-height: 100dvh;
+  margin: 0;
+  overflow-x: clip;
+}
+
+.dark body {
+  letter-spacing: 0.008em;
+}
+
+time,
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Restrained Liquid Glass — Isolated compositing layer prevents blur flicker & nested artifacts */
+.liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(130%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(130%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-specular), var(--glass-shadow);
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+.liquid-glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-specular), var(--glass-shadow);
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+/* Graceful fallback for older GPUs/browsers without backdrop-filter support */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .liquid-glass,
+  .liquid-glass-strong {
+    background: var(--surface-card);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Standard Architectural Card — NO glass effects so charts & text stay razor-sharp */
+.wb-surface {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-card);
+}
+
+.wb-subtle {
+  background-color: var(--surface-subtle);
+}
+
+/* ==========================================================================
+   5. Color-Vision & Pattern Assist (data-pattern-assist="true")
+   - Distinct geometric micro-patterns that never obscure text
+   ========================================================================== */
+html[data-pattern-assist="true"] .wb-pattern-yellow {
+  background-image: radial-gradient(circle at 2px 2px, currentColor 0.9px, transparent 0);
+  background-size: 9px 9px;
+}
+
+html[data-pattern-assist="true"] .wb-pattern-green {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 6px,
+    currentColor 6px,
+    currentColor 7px
+  );
+}
+
+html[data-pattern-assist="true"] .wb-pattern-blue {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 6px,
+    currentColor 6px,
+    currentColor 7px
+  );
+}
+
+html[data-pattern-assist="true"] .wb-pattern-red {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0,
+    transparent 5px,
+    currentColor 5px,
+    currentColor 6.3px
+  );
+}
+
+html[data-pattern-assist="true"] .wb-pattern-balanced {
+  background-image: radial-gradient(circle at 2px 2px, currentColor 0.75px, transparent 0);
+  background-size: 12px 12px;
+}
+
+/* Skip Link for Keyboard / Screen Reader Accessibility */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--accent-primary);
+  color: var(--accent-primary-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: calc(12px + env(safe-area-inset-top, 0px));
+}
+
+/* High-contrast visible focus indicator (WCAG 2.2 Focus Appearance; 3px in High-Contrast) */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Distinct keyboard focus vs. RULER selected state on emotion tiles (unmistakable even on Green tiles & after 10s outline reversion) */
+.wb-emotion-tile:focus-visible {
+  outline: var(--focus-ring-width) solid var(--palette-deep-plum);
+  outline-offset: 3px;
+  z-index: 25;
+}
+
+.dark .wb-emotion-tile:focus-visible {
+  outline: var(--focus-ring-width) solid #F2F5F2;
+  outline-offset: 3px;
+}
+
+.wb-emotion-tile[data-selected="true"]:focus-visible {
+  outline-offset: 4px;
+}
+
+/* Prevent sticky hover backgrounds on touch devices */
+@media (hover: none) {
+  button:hover,
+  a:hover {
+    filter: none;
+  }
+}
+
+/* ==========================================================================
+   6. Reduce Motion Mode (data-reduce-motion="true")
+   - Kills spring animations, tab slides, hover lifts & morphs
+   ========================================================================== */
+html[data-reduce-motion="true"] *,
+html[data-reduce-motion="true"] *::before,
+html[data-reduce-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+html[data-reduce-motion="true"] button:hover,
+html[data-reduce-motion="true"] button:active {
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) *,
+  html:not([data-reduce-motion="false"]) *::before,
+  html:not([data-reduce-motion="false"]) *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Uniform top & bottom taskbar tokens + safe page clearance */
+:root {
+  --top-bar-height: 56px;
+  --top-veil-feather: 44px;
+  --bottom-veil-feather: 52px;
+  --capsule-dock-height: 60px;
+  --capsule-dock-lift: 16px;
+  --page-bottom-clearance: calc(
+    var(--capsule-dock-height, 64px) + var(--capsule-dock-lift, 16px) + env(safe-area-inset-bottom, 0px) + 32px
+  );
+}
+
+@media (min-width: 768px) {
+  :root {
+    --capsule-dock-height: 64px;
+    --capsule-dock-lift: 24px;
+  }
+}
+
+.pt-safe-header-main {
+  padding-top: calc(var(--top-bar-height, 56px) + env(safe-area-inset-top, 0px) + 0.625rem);
+}
+
+@media (min-width: 640px) {
+  .pt-safe-header-main {
+    padding-top: calc(var(--top-bar-height, 56px) + env(safe-area-inset-top, 0px) + 1.125rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pt-safe-header-main {
+    padding-top: calc(var(--top-bar-height, 56px) + env(safe-area-inset-top, 0px) + 1.375rem);
+  }
+}
+
+.pt-safe-header-coach {
+  padding-top: calc(var(--top-bar-height, 56px) + env(safe-area-inset-top, 0px) + 0.625rem);
+}
+
+.pb-safe-main {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 28px);
+}
+
+.pb-safe-coach {
+  padding-bottom: calc(
+    var(--capsule-dock-height, 60px) + var(--capsule-dock-lift, 16px) + env(safe-area-inset-bottom, 0px) + 12px
+  );
+}
+
+/* Viewport-locked flex shell for Coach tab (top navbar + flex-1 main + fixed bottom capsule dock) */
+.wb-coach-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Single-viewport Coach workspace fills remaining vertical space between Top Bar and Bottom Capsule Dock */
+.wb-coach-viewport {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Coach chat window: flex: 1 and min-height: 0 prevent overflow at any viewport height */
+.wb-coach-chat-window {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+/* Subtle horizontal scroll fade hint for mobile chip bars */
+.scroll-fade-x {
+  mask-image: linear-gradient(to right, transparent 0, #000 10px, #000 calc(100% - 14px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 10px, #000 calc(100% - 14px), transparent 100%);
+}
+
+@media (min-width: 640px) {
+  .scroll-fade-x {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
+
+/* ==========================================================================
+   Mouse Click-and-Drag Swipe-to-Scroll Cursor Feedback & Clean Scrollbars
+   ========================================================================== */
+html,
+body,
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .drag-scroll-surface {
+    cursor: grab;
+  }
+
+  .drag-scroll-surface button,
+  .drag-scroll-surface a,
+  .drag-scroll-surface select,
+  .drag-scroll-surface summary,
+  .drag-scroll-surface label[for],
+  .drag-scroll-surface [role="button"],
+  .drag-scroll-surface [role="tab"],
+  .drag-scroll-surface [role="menuitem"],
+  .drag-scroll-surface [role="option"],
+  .drag-scroll-surface [role="switch"],
+  .drag-scroll-surface [role="gridcell"] {
+    cursor: pointer;
+  }
+
+  .drag-scroll-surface input,
+  .drag-scroll-surface textarea,
+  .drag-scroll-surface [contenteditable="true"],
+  .drag-scroll-surface [contenteditable=""] {
+    cursor: text;
+  }
+}
+
+body.is-drag-scrolling {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+body.is-drag-scrolling .drag-scroll-surface,
+body.is-drag-scrolling a,
+body.is-drag-scrolling button,
+body.is-drag-scrolling [role="button"] {
+  cursor: grabbing !important;
+}
+
+/* ==========================================================================
+   Settings Pattern 2: Compact Side-Dock & Right Pane Container Queries
+   ========================================================================== */
+.wb-settings-rail {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 88px;
+  padding: 10px 6px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  background-color: var(--dock-rail-bg);
+  border-right: 1px solid var(--dock-divider);
+}
+
+@media (min-width: 768px) {
+  .wb-settings-rail {
+    width: 108px;
+    padding: 12px 8px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .wb-settings-rail {
+    width: 180px;
+    padding: 12px 12px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  }
+}
+
+html[data-reading-comfort="true"] .wb-settings-rail {
+  width: 96px;
+}
+
+@media (min-width: 768px) {
+  html[data-reading-comfort="true"] .wb-settings-rail {
+    width: 116px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html[data-reading-comfort="true"] .wb-settings-rail {
+    width: 196px;
+  }
+}
+
+.wb-dock-tile {
+  background: var(--dock-tile-bg);
+  border: 1px solid var(--dock-tile-border);
+  color: var(--dock-tile-ink);
+}
+
+.wb-dock-tile-active {
+  background: var(--dock-active-bg);
+  border: 1px solid var(--dock-active-border);
+  color: var(--dock-active-ink);
+  box-shadow: var(--dock-active-shadow);
+  backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+}
+
+html[data-high-contrast="true"] .wb-dock-tile,
+html[data-high-contrast="true"] .wb-dock-tile-active {
+  border-width: 1.5px;
+}
+
+.wb-dock-tile,
+.wb-dock-tile-active {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wb-dock-label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .wb-dock-label {
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+}
+
+html[data-reading-comfort="true"] .wb-dock-label {
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+}
+
+.wb-settings-pane {
+  container-type: inline-size;
+  container-name: settings-pane;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+.wb-settings-pane button,
+.wb-settings-pane a,
+.wb-settings-pane [role="switch"],
+.wb-settings-pane [role="tab"],
+.wb-settings-pane [role="radio"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wb-pane-grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.625rem;
+}
+
+@container settings-pane (min-width: 420px) {
+  .wb-pane-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.wb-pane-grid-3 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+@container settings-pane (min-width: 470px) {
+  .wb-pane-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wb-pane-mini-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.625rem;
+}
+
+@container settings-pane (min-width: 245px) {
+  .wb-pane-mini-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container settings-pane (min-width: 500px) {
+  .wb-pane-mini-2 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.wb-pane-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@container settings-pane (min-width: 390px) {
+  .wb-pane-row {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.wb-pane-toggle-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.wb-pane-toggle-switch {
+  display: inline-flex;
+  min-height: 44px;
+  min-width: 82px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  align-self: flex-end;
+  border-radius: 0.75rem;
+  padding-left: 0.5rem;
+  padding-right: 0.125rem;
+}
+
+@container settings-pane (min-width: 310px) {
+  .wb-pane-toggle-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .wb-pane-toggle-switch {
+    align-self: center;
+  }
+}
+
+/* Anti-Sandwich Container Query Rules:
+   <= 380px pane -> breathable 2-row stacked card (full-width text header + full-width action footer)
+   >= 381px pane -> crisp 1-row horizontal flex layout */
+.wb-pane-item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6875rem;
+}
+
+.wb-pane-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.wb-pane-item-actions > button,
+.wb-pane-item-actions > a {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 100%;
+  justify-content: center;
+}
+
+.wb-pane-header-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.625rem;
+}
+
+.wb-pane-price-col {
+  flex-shrink: 0;
+  text-align: left;
+}
+
+@container settings-pane (min-width: 381px) {
+  .wb-pane-item-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.875rem;
+  }
+
+  .wb-pane-item-actions {
+    width: auto;
+    flex-shrink: 0;
+    justify-content: flex-end;
+  }
+
+  .wb-pane-item-actions > button,
+  .wb-pane-item-actions > a {
+    flex: 0 0 auto;
+    width: auto;
+  }
+
+  .wb-pane-header-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .wb-pane-price-col {
+    text-align: right;
+  }
+}
+
+/* Segmented Controls inside Settings Right Pane:
+   4-option controls cleanly wrap to 2x2 below 340px pane width, and 1x4 at >= 340px */
+.wb-pane-seg-4 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+@container settings-pane (min-width: 340px) {
+  .wb-pane-seg-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.wb-pane-seg-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+/* Pinned Compassionate Grounding Banner in Help & Support */
+.wb-support-grounding {
+  background: var(--support-banner-bg);
+  border: 1px solid var(--support-banner-border);
+}
+
+html[data-high-contrast="true"] .wb-support-grounding {
+  border-width: 1.5px;
+}
+
+html.dark[data-reduce-transparency="true"] .wb-support-grounding {
+  background: #1B1530;
+}
+
+/* ==========================================================================
+   Settings Pattern 3: Expandable Bento Accordion
+   - Clean 16px rounded bento container with scannable live summary pills
+   - Smooth CSS Grid 0fr -> 1fr accordion motion (0ms under Reduce Motion)
+   - Full Light, Dark, Calm, High-Contrast & Reduce Transparency parity
+   ========================================================================== */
+.wb-bento-card {
+  border-radius: 16px;
+  background-color: var(--bento-bg);
+  border: 1px solid var(--bento-border);
+  box-shadow: var(--bento-shadow);
+  overflow: hidden;
+  transition:
+    background-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wb-bento-card[data-open="true"] {
+  background-color: var(--bento-open-bg);
+  border-color: var(--bento-open-border);
+  box-shadow: var(--bento-open-shadow);
+}
+
+html[data-high-contrast="true"] .wb-bento-card,
+html[data-reduce-transparency="true"] .wb-bento-card[data-open="true"] {
+  border-width: 1.5px;
+  box-shadow: none;
+}
+
+.wb-bento-header {
+  display: flex;
+  width: 100%;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8125rem 0.875rem;
+  text-align: left;
+  background-color: transparent;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 640px) {
+  .wb-bento-header {
+    padding: 0.875rem 1rem;
+  }
+}
+
+.wb-bento-card[data-open="false"] .wb-bento-header:hover {
+  background-color: var(--surface-hover);
+}
+
+.wb-bento-card[data-open="true"] .wb-bento-header {
+  background-color: var(--bento-open-header-bg);
+}
+
+.wb-bento-header:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: -3px;
+  border-radius: 15px;
+}
+
+.wb-bento-chevron {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), color 180ms ease;
+}
+
+.wb-bento-card[data-open="true"] .wb-bento-chevron {
+  transform: rotate(180deg);
+}
+
+.wb-bento-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wb-bento-card[data-open="true"] .wb-bento-collapse {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.wb-bento-collapse-inner {
+  overflow: hidden;
+  min-height: 0;
+  visibility: hidden;
+  transition: visibility 0ms linear 220ms;
+}
+
+.wb-bento-card[data-open="true"] .wb-bento-collapse-inner {
+  visibility: visible;
+  transition-delay: 0ms;
+}
+
+.wb-bento-body {
+  border-top: 1px solid var(--bento-divider);
+  padding: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .wb-bento-body {
+    padding: 1rem;
+  }
+}
+
+.wb-bento-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  border-radius: 9999px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.125rem 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html[data-reading-comfort="true"] .wb-bento-pill {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.wb-bento-pill[data-tone="neutral"] {
+  background-color: var(--bento-pill-bg);
+  border-color: var(--bento-pill-border);
+  color: var(--bento-pill-fg);
+}
+
+.wb-bento-pill[data-tone="accent"] {
+  background-color: var(--bento-pill-accent-bg);
+  border-color: var(--bento-pill-accent-border);
+  color: var(--bento-pill-accent-fg);
+}
+
+.wb-bento-pill[data-tone="positive"] {
+  background-color: var(--q-green-bg);
+  border-color: var(--q-green-border);
+  color: var(--q-green-fg);
+}
+
+.wb-bento-pill[data-tone="warn"] {
+  background-color: var(--q-yellow-bg);
+  border-color: var(--q-yellow-border);
+  color: var(--q-yellow-fg);
+}
+
+html[data-reduce-motion="true"] .wb-bento-card,
+html[data-reduce-motion="true"] .wb-bento-header,
+html[data-reduce-motion="true"] .wb-bento-chevron,
+html[data-reduce-motion="true"] .wb-bento-collapse,
+html[data-reduce-motion="true"] .wb-bento-collapse-inner {
+  transition-duration: 0ms !important;
+  transition-delay: 0ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) .wb-bento-card,
+  html:not([data-reduce-motion="false"]) .wb-bento-header,
+  html:not([data-reduce-motion="false"]) .wb-bento-chevron,
+  html:not([data-reduce-motion="false"]) .wb-bento-collapse,
+  html:not([data-reduce-motion="false"]) .wb-bento-collapse-inner {
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+
+/* ==========================================================================
+   14. Latest Emotion Card — 2px Active / Blended Outline, Finite 8s Ambient Glow
+       & Inside-the-Box Definition + Physical Cues Reveal
+   - GPU-composited only (strictly opacity + transform inside @keyframes)
+   - Outer ::before halo & inner ::after edge aura pulse once for 8s on emotion
+     selection without ever restarting when the inside-box inspect panel toggles
+   - Smooth CSS Grid 0fr -> 1fr reveal (240ms) + inner opacity fade (180ms + 50ms)
+   - Full Light, Dark, Calm, High-Contrast, Reading Comfort & Reduce Motion parity
+   ========================================================================== */
+@keyframes emotion-ambient-settle-a {
+  0% {
+    opacity: 0;
+    transform: scale(0.992);
+  }
+  32% {
+    opacity: var(--glow-outer-max);
+    transform: scale(1.012);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.996);
+  }
+}
+
+@keyframes emotion-ambient-settle-b {
+  0% {
+    opacity: 0;
+    transform: scale(0.992);
+  }
+  32% {
+    opacity: var(--glow-outer-max);
+    transform: scale(1.012);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.996);
+  }
+}
+
+@keyframes emotion-ambient-settle-inner-a {
+  0% {
+    opacity: 0;
+    transform: scale(0.996);
+  }
+  32% {
+    opacity: var(--glow-inner-max);
+    transform: scale(1.004);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.998);
+  }
+}
+
+@keyframes emotion-ambient-settle-inner-b {
+  0% {
+    opacity: 0;
+    transform: scale(0.996);
+  }
+  32% {
+    opacity: var(--glow-inner-max);
+    transform: scale(1.004);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.998);
+  }
+}
+
+.wb-latest-emotion-card {
+  position: relative;
+  isolation: isolate;
+  border-radius: 1rem;
+  --glow-outer-max: 0.42;
+  --glow-inner-max: 0.18;
+  --glow-blur: 18px;
+  --glow-spread: -5px;
+}
+
+.wb-latest-emotion-card[data-has-emotion="false"] {
+  padding: 1.5px;
+  background: var(--border-hairline);
+  box-shadow: none;
+}
+
+.wb-latest-emotion-card[data-has-emotion="true"] {
+  padding: 2px;
+  background: var(--latest-emotion-border-bg, var(--latest-emotion-border));
+}
+
+.wb-latest-emotion-card[data-has-emotion="true"][data-blended="false"] {
+  box-shadow: 0 0 0 1px var(--latest-emotion-border);
+}
+
+.wb-latest-emotion-card[data-has-emotion="true"][data-blended="true"] {
+  padding: 1.5px;
+  box-shadow: 0 0 0 0.75px
+    color-mix(
+      in srgb,
+      var(--latest-emotion-border) 50%,
+      var(--latest-emotion-border-secondary, var(--latest-emotion-border))
+    );
+}
+
+/* GPU-Composited 10s Slow Continuous Gradient Angle Shift along 1.5px Blended Border */
+@keyframes wb-blend-border-spin {
+  from {
+    transform: translate3d(-50%, -50%, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(-50%, -50%, 0) rotate(360deg);
+  }
+}
+
+.wb-latest-blend-border {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wb-latest-blend-border::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(160%, 640px);
+  aspect-ratio: 1;
+  background: conic-gradient(
+    from 135deg,
+    var(--latest-emotion-border) 0deg,
+    var(--latest-emotion-border-secondary, var(--latest-emotion-border)) 180deg,
+    var(--latest-emotion-border) 360deg
+  );
+  transform: translate3d(-50%, -50%, 0);
+  will-change: transform;
+  animation: wb-blend-border-spin 10s linear infinite;
+}
+
+/* Outer 8-second ambient halo (::before, never clipped around expanding card) */
+.wb-latest-emotion-card::before {
+  content: '';
+  position: absolute;
+  inset: var(--glow-spread);
+  border-radius: calc(1rem + 4px);
+  background: var(--latest-emotion-glow-bg, var(--latest-emotion-glow));
+  filter: blur(var(--glow-blur));
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.wb-latest-emotion-card[data-has-emotion="true"][data-glow-phase="a"]::before {
+  will-change: transform, opacity;
+  animation: emotion-ambient-settle-a 8s cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+.wb-latest-emotion-card[data-has-emotion="true"][data-glow-phase="b"]::before {
+  will-change: transform, opacity;
+  animation: emotion-ambient-settle-b 8s cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+.wb-latest-emotion-surface {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: calc(1rem - 2px);
+  transition:
+    background-color 350ms ease,
+    color 350ms ease;
+}
+
+.wb-latest-emotion-card[data-has-emotion="true"][data-blended="true"] .wb-latest-emotion-surface {
+  border-radius: calc(1rem - 1.5px);
+}
+
+/* Four Distinct Emotion-Group Tap Animations on Latest Emotion Card
+   - Strictly GPU-composited (transform + opacity only) -> zero layout shift or icon jitter
+   - Alternating A/B keyframes restart cleanly on rapid consecutive taps without remounting
+   - Every group settles at transform: translate3d(0,0,0) scale3d(1,1,1); opacity: 1 for a seamless handoff into wb-latest-text-breathe */
+
+/* 1. Yellow / High Energy ("Spark Pop / Kinetic Lift") — lively, buoyant upward pop & spring settle (440ms) */
+@keyframes wb-latest-yellow-a {
+  0% {
+    transform: translate3d(0, 2px, 0) scale3d(0.95, 0.95, 1);
+    opacity: 0.9;
+  }
+  36% {
+    transform: translate3d(0, -3.5px, 0)
+      scale3d(
+        min(var(--wb-latest-peak-scale, 1.18), 1.18),
+        min(var(--wb-latest-peak-scale, 1.18), 1.18),
+        1
+      );
+    opacity: 1;
+  }
+  66% {
+    transform: translate3d(0, 0.75px, 0) scale3d(0.985, 0.985, 1);
+    opacity: 1;
+  }
+  84% {
+    transform: translate3d(0, -0.5px, 0) scale3d(1.012, 1.012, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes wb-latest-yellow-b {
+  0% {
+    transform: translate3d(0, 2px, 0) scale3d(0.95, 0.95, 1);
+    opacity: 0.9;
+  }
+  36% {
+    transform: translate3d(0, -3.5px, 0)
+      scale3d(
+        min(var(--wb-latest-peak-scale, 1.18), 1.18),
+        min(var(--wb-latest-peak-scale, 1.18), 1.18),
+        1
+      );
+    opacity: 1;
+  }
+  66% {
+    transform: translate3d(0, 0.75px, 0) scale3d(0.985, 0.985, 1);
+    opacity: 1;
+  }
+  84% {
+    transform: translate3d(0, -0.5px, 0) scale3d(1.012, 1.012, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+/* 2. Green / Low Energy ("Warm Breath / Gentle Float") — soft, unhurried restorative expansion & float settle (580ms) */
+@keyframes wb-latest-green-a {
+  0% {
+    transform: translate3d(0, 0.5px, 0) scale3d(0.975, 0.975, 1);
+    opacity: 0.88;
+  }
+  46% {
+    transform: translate3d(0, -1.75px, 0)
+      scale3d(
+        min(var(--wb-latest-peak-scale, 1.085), 1.085),
+        min(var(--wb-latest-peak-scale, 1.085), 1.085),
+        1
+      );
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes wb-latest-green-b {
+  0% {
+    transform: translate3d(0, 0.5px, 0) scale3d(0.975, 0.975, 1);
+    opacity: 0.88;
+  }
+  46% {
+    transform: translate3d(0, -1.75px, 0)
+      scale3d(
+        min(var(--wb-latest-peak-scale, 1.085), 1.085),
+        min(var(--wb-latest-peak-scale, 1.085), 1.085),
+        1
+      );
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+/* 3. Blue / Low Energy ("Soft Sink & Quiet Rise") — gentle cushioned settle followed by slow supportive rise (620ms) */
+@keyframes wb-latest-blue-a {
+  0% {
+    transform: translate3d(0, -0.5px, 0) scale3d(0.995, 0.995, 1);
+    opacity: 0.94;
+  }
+  34% {
+    transform: translate3d(0, 3.25px, 0) scale3d(0.955, 0.955, 1);
+    opacity: 0.82;
+  }
+  62% {
+    transform: translate3d(0, 1.75px, 0) scale3d(0.976, 0.976, 1);
+    opacity: 0.91;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes wb-latest-blue-b {
+  0% {
+    transform: translate3d(0, -0.5px, 0) scale3d(0.995, 0.995, 1);
+    opacity: 0.94;
+  }
+  34% {
+    transform: translate3d(0, 3.25px, 0) scale3d(0.955, 0.955, 1);
+    opacity: 0.82;
+  }
+  62% {
+    transform: translate3d(0, 1.75px, 0) scale3d(0.976, 0.976, 1);
+    opacity: 0.91;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+/* 4. Red / High-Activation & Tension ("Steady Ground / Controlled Dampen") — brief dampened grounding settle (400ms) */
+@keyframes wb-latest-red-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 0.94;
+  }
+  22% {
+    transform: translate3d(-2.5px, 0, 0) scale3d(0.972, 0.972, 1);
+    opacity: 0.97;
+  }
+  48% {
+    transform: translate3d(1.75px, 0, 0) scale3d(0.99, 0.99, 1);
+    opacity: 1;
+  }
+  72% {
+    transform: translate3d(-0.6px, 0, 0) scale3d(0.997, 0.997, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes wb-latest-red-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 0.94;
+  }
+  22% {
+    transform: translate3d(-2.5px, 0, 0) scale3d(0.972, 0.972, 1);
+    opacity: 0.97;
+  }
+  48% {
+    transform: translate3d(1.75px, 0, 0) scale3d(0.99, 0.99, 1);
+    opacity: 1;
+  }
+  72% {
+    transform: translate3d(-0.6px, 0, 0) scale3d(0.997, 0.997, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+.wb-latest-emotion-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  transform-origin: center center;
+  backface-visibility: hidden;
+}
+
+.wb-latest-emotion-glyph {
+  flex-shrink: 0;
+}
+
+.wb-latest-emotion-glyph-svg {
+  width: clamp(23px, 3.6vw, 32px);
+  height: clamp(23px, 3.6vw, 32px);
+  flex-shrink: 0;
+  shape-rendering: geometricPrecision;
+}
+
+/* Fallback / Neutral gentle settle */
+.wb-latest-emotion-label[data-bounce-phase="a"] {
+  will-change: transform, opacity;
+  animation: wb-latest-green-a 520ms cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+.wb-latest-emotion-label[data-bounce-phase="b"] {
+  will-change: transform, opacity;
+  animation: wb-latest-green-b 520ms cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+/* Group 1: Yellow / High Energy */
+.wb-latest-emotion-label[data-quadrant="yellow"][data-bounce-phase="a"] {
+  will-change: transform, opacity;
+  animation: wb-latest-yellow-a 440ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+.wb-latest-emotion-label[data-quadrant="yellow"][data-bounce-phase="b"] {
+  will-change: transform, opacity;
+  animation: wb-latest-yellow-b 440ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+/* Group 2: Green / Low Energy */
+.wb-latest-emotion-label[data-quadrant="green"][data-bounce-phase="a"] {
+  will-change: transform, opacity;
+  animation: wb-latest-green-a 580ms cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+.wb-latest-emotion-label[data-quadrant="green"][data-bounce-phase="b"] {
+  will-change: transform, opacity;
+  animation: wb-latest-green-b 580ms cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+/* Group 3: Blue / Low Energy */
+.wb-latest-emotion-label[data-quadrant="blue"][data-bounce-phase="a"] {
+  will-change: transform, opacity;
+  animation: wb-latest-blue-a 620ms cubic-bezier(0.33, 0, 0.2, 1) 1 both;
+}
+
+.wb-latest-emotion-label[data-quadrant="blue"][data-bounce-phase="b"] {
+  will-change: transform, opacity;
+  animation: wb-latest-blue-b 620ms cubic-bezier(0.33, 0, 0.2, 1) 1 both;
+}
+
+/* Group 4: Red / High-Activation & Tension */
+.wb-latest-emotion-label[data-quadrant="red"][data-bounce-phase="a"] {
+  will-change: transform, opacity;
+  animation: wb-latest-red-a 400ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+.wb-latest-emotion-label[data-quadrant="red"][data-bounce-phase="b"] {
+  will-change: transform, opacity;
+  animation: wb-latest-red-b 400ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+/* Continuous Subtle Breathing Text on Latest Emotion Card (at rest after selection settle)
+   - Slow 4.8s ease-in-out alternate breathing cadence modeled after calm breathing text
+   - Strictly GPU-composited (transform + opacity only) -> zero layout shift or reflow
+   - Starts at exact rest frame (scale3d(1,1,1), opacity: 1) for seamless handoff from 520ms bounce
+   - Strictly bounded inside padded safe zone so text never touches borders or header icons */
+@keyframes wb-latest-text-breathe {
+  0% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale3d(0.966, 0.966, 1);
+    opacity: var(--wb-latest-breathe-opacity, 0.83);
+  }
+}
+
+.wb-latest-emotion-text {
+  display: inline-block;
+  transform-origin: center center;
+  backface-visibility: hidden;
+  --wb-latest-breathe-opacity: 0.83;
+}
+
+.wb-latest-emotion-text[data-breathing="active"] {
+  will-change: transform, opacity;
+  animation: wb-latest-text-breathe 4.8s ease-in-out infinite alternate;
+}
+
+html[data-high-contrast="true"] .wb-latest-emotion-text {
+  --wb-latest-breathe-opacity: 0.92;
+}
+
+/* Smooth, brisk full-button fill highlight & reset transitions for 16 emotion tiles */
+.wb-emotion-tile {
+  transition:
+    transform 90ms cubic-bezier(0.2, 0, 0, 1),
+    color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    filter 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wb-emotion-tile-fill {
+  transition:
+    background-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Inner 8-second soft edge aura (::after inside large emotion box) */
+.wb-latest-emotion-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--latest-emotion-glow-bg, var(--latest-emotion-glow));
+  mask-image: radial-gradient(
+    ellipse 90% 86% at 50% 50%,
+    transparent 48%,
+    rgba(0, 0, 0, 0.42) 82%,
+    #000 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 90% 86% at 50% 50%,
+    transparent 48%,
+    rgba(0, 0, 0, 0.42) 82%,
+    #000 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wb-latest-emotion-card[data-has-emotion="true"][data-glow-phase="a"]
+  .wb-latest-emotion-surface::after {
+  will-change: transform, opacity;
+  animation: emotion-ambient-settle-inner-a 8s cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+.wb-latest-emotion-card[data-has-emotion="true"][data-glow-phase="b"]
+  .wb-latest-emotion-surface::after {
+  will-change: transform, opacity;
+  animation: emotion-ambient-settle-inner-b 8s cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+/* Quiet Info Toggle Button ([i] — 28px visual circle inside 32px hit area) */
+.wb-latest-emotion-info-btn {
+  color: inherit;
+  opacity: 0.65;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wb-latest-emotion-info-circle {
+  border: 1px solid transparent;
+  background-color: transparent;
+  transition:
+    background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wb-latest-emotion-info-btn:hover:not(:disabled),
+.wb-latest-emotion-info-btn:focus-visible:not(:disabled),
+.wb-latest-emotion-info-btn[data-expanded="true"]:not(:disabled) {
+  opacity: 1;
+}
+
+.wb-latest-emotion-info-btn:hover:not(:disabled) .wb-latest-emotion-info-circle {
+  background-color: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.wb-latest-emotion-info-btn[data-expanded="true"]:not(:disabled) .wb-latest-emotion-info-circle {
+  background-color: color-mix(in srgb, currentColor 14%, transparent);
+  border-color: color-mix(in srgb, currentColor 32%, transparent);
+}
+
+.wb-latest-emotion-info-btn:disabled,
+.wb-latest-emotion-info-btn[aria-disabled="true"] {
+  opacity: 0.26;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Inside-the-Large-Emotion-Box Compositor-Safe Reveal (CSS Grid 0fr -> 1fr) */
+.wb-emotion-inspect-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wb-emotion-inspect-grid[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.wb-emotion-inspect-inner {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 140ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    visibility 0ms linear 240ms;
+}
+
+.wb-emotion-inspect-grid[data-open="true"] .wb-emotion-inspect-inner {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 180ms cubic-bezier(0.4, 0, 0.2, 1) 50ms,
+    visibility 0ms linear 0ms;
+}
+
+/* Unclip :focus-visible rings once reveal has settled open */
+.wb-emotion-inspect-grid[data-open="true"][data-settled="true"] .wb-emotion-inspect-inner {
+  overflow: visible;
+}
+
+/* Inner divider & 12px-14px breathing room inside the large emotion box */
+.wb-emotion-inspect-body {
+  margin-top: 6px;
+  padding: 13px 2px 2px;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+/* One-line plain-language definition (clamped to 1 line by default) */
+.wb-emotion-definition {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  opacity: 0.94;
+}
+
+.wb-emotion-cues-label {
+  opacity: 0.76;
+  white-space: nowrap;
+}
+
+/* Compact, scannable inline physical cue chips */
+.wb-emotion-cue-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  border-radius: 9999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: inherit;
+  background-color: color-mix(in srgb, currentColor 9%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+/* Two-part breakdown for Blended Emotions (Emotion A + Emotion B) */
+.wb-emotion-blend-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 11px;
+}
+
+.wb-emotion-blend-part-second {
+  padding-top: 11px;
+  border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+}
+
+/* Dark Mode: restrained hairline-led ambient aura (no wide heavy halo) */
+.dark .wb-latest-emotion-card {
+  --glow-outer-max: 0.22;
+  --glow-inner-max: 0.10;
+  --glow-blur: 10px;
+  --glow-spread: -2px;
+}
+
+/* Calm / Low-Stimulus Mode: softer glow + calm, low-glare tinted definition & cues */
+html[data-calm-mode="true"] .wb-latest-emotion-card {
+  --glow-outer-max: 0.18;
+  --glow-inner-max: 0.08;
+  --glow-blur: 10px;
+  --glow-spread: -2px;
+}
+
+html.dark[data-calm-mode="true"] .wb-latest-emotion-card {
+  --glow-outer-max: 0.16;
+  --glow-inner-max: 0.08;
+  --glow-blur: 9px;
+  --glow-spread: -2px;
+}
+
+html[data-calm-mode="true"] .wb-emotion-inspect-body {
+  border-top-color: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+html[data-calm-mode="true"] .wb-emotion-definition {
+  opacity: 0.88;
+}
+
+html[data-calm-mode="true"] .wb-emotion-cue-chip {
+  background-color: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+/* High-Contrast Mode: >= 7:1 contrast on definition + crisp 1.5px borders on physical cue chips */
+html[data-high-contrast="true"] .wb-latest-emotion-card,
+html[data-calm-mode="true"][data-high-contrast="true"] .wb-latest-emotion-card {
+  --glow-outer-max: 0.22;
+  --glow-inner-max: 0.06;
+  --glow-blur: 10px;
+  --glow-spread: -2px;
+}
+
+html.dark[data-high-contrast="true"] .wb-latest-emotion-card,
+html.dark[data-calm-mode="true"][data-high-contrast="true"] .wb-latest-emotion-card {
+  --glow-outer-max: 0.24;
+  --glow-inner-max: 0.08;
+  --glow-blur: 10px;
+  --glow-spread: -2px;
+}
+
+html[data-high-contrast="true"] .wb-latest-emotion-info-btn:not(:disabled) {
+  opacity: 0.9;
+}
+
+html[data-high-contrast="true"] .wb-latest-emotion-info-btn:hover:not(:disabled) .wb-latest-emotion-info-circle,
+html[data-high-contrast="true"] .wb-latest-emotion-info-btn:focus-visible:not(:disabled) .wb-latest-emotion-info-circle,
+html[data-high-contrast="true"] .wb-latest-emotion-info-btn[data-expanded="true"]:not(:disabled) .wb-latest-emotion-info-circle {
+  border-width: 1.5px;
+  border-color: currentColor;
+}
+
+html[data-high-contrast="true"] .wb-emotion-inspect-body {
+  border-top-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+html[data-high-contrast="true"] .wb-emotion-definition,
+html[data-high-contrast="true"] .wb-emotion-cues-label {
+  opacity: 1;
+}
+
+html[data-high-contrast="true"] .wb-emotion-cue-chip {
+  border-width: 1.5px;
+  border-color: currentColor;
+  font-weight: 600;
+  background-color: rgba(254, 254, 254, 0.52);
+}
+
+html.dark[data-high-contrast="true"] .wb-emotion-cue-chip {
+  background-color: rgba(9, 0, 26, 0.48);
+}
+
+/* Reading Comfort: unwrap definition cleanly with overflow-wrap: anywhere & generous line-height */
+html[data-reading-comfort="true"] .wb-emotion-definition {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.62;
+}
+
+html[data-reading-comfort="true"] .wb-emotion-cue-chip {
+  overflow-wrap: anywhere;
+  white-space: normal;
+  padding: 4px 11px;
+  line-height: 1.45;
+}
+
+html[data-reading-comfort="true"] .wb-emotion-blend-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+html[data-reading-comfort="true"] .wb-emotion-blend-part-second {
+  padding-top: 12px;
+  padding-left: 0;
+  border-left: none;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+/* Pressed Instant Check-In Tile — Subtle Companion Glow (~35% of Latest Emotion Card, synced 8s) */
+@keyframes emotion-tile-glow-settle {
+  0% {
+    opacity: 0;
+    transform: scale(0.994);
+  }
+  32% {
+    opacity: var(--tile-glow-max);
+    transform: scale(1.006);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.998);
+  }
+}
+
+.wb-emotion-tile {
+  contain: layout style;
+  --tile-radius: 10px;
+  --tile-glow-max: 0.16;
+  --tile-glow-blur: 9px;
+  --tile-glow-spread: -2px;
+  border-radius: var(--tile-radius);
+  border: 1.5px solid var(--tile-border, var(--border-hairline));
+}
+
+@media (hover: hover) {
+  .wb-emotion-tile:hover:not(:disabled) {
+    border-color: var(--tile-border-hover, var(--tile-border, var(--border-strong)));
+  }
+}
+
+.wb-emotion-tile:active:not(:disabled) {
+  border-color: var(--tile-border-hover, var(--tile-border, var(--border-strong)));
+}
+
+/* Shared size-independent surface fill + top-edge specular micro-highlight across Quick Check-In & Instant Check-In */
+.wb-emotion-tile-fill {
+  border-radius: calc(var(--tile-radius, 10px) - 1.5px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+.dark .wb-emotion-tile-fill {
+  box-shadow: inset 0 1px 0 rgba(254, 254, 254, 0.11);
+}
+
+.wb-emotion-tile[data-selected="true"] .wb-emotion-tile-fill {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+html[data-high-contrast="true"] .wb-emotion-tile-fill,
+html[data-reduce-transparency="true"] .wb-emotion-tile-fill {
+  box-shadow: none;
+}
+
+.wb-emotion-tile-pattern {
+  border-radius: calc(var(--tile-radius, 10px) - 1.5px);
+}
+
+/* Today tab single-window framing: balanced Latest card height + scroll-snap clearance for Quick Check-In */
+.wb-latest-emotion-surface-today {
+  min-height: clamp(78px, 10.2dvh, 98px);
+}
+
+.wb-latest-emotion-titlebox-today {
+  min-height: clamp(58px, 7.6dvh, 76px);
+}
+
+.wb-today-checkin-card {
+  scroll-margin-top: calc(var(--top-bar-height, 56px) + env(safe-area-inset-top, 0px) + 10px);
+  scroll-margin-bottom: calc(
+    var(--capsule-dock-height, 60px) + var(--capsule-dock-lift, 16px) + env(safe-area-inset-bottom, 0px) + 14px
+  );
+}
+
+.wb-today-bottom-clearance {
+  padding-bottom: var(--page-bottom-clearance);
+}
+
+/* Viewport-aligned inline tile sizing so all 16 emotions (rows 1-8 on mobile, 4x4 on sm+) fit cleanly above the floating dock */
+.wb-emotion-tile-inline {
+  min-height: clamp(32px, calc((100dvh - 392px) / 8), 46px);
+}
+
+/* Instant Check-In Full-Viewport 2x8 Equal-Height Grid (Zero dead space, zero scroll) */
+.wb-emotion-matrix-sheet {
+  display: grid;
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  gap: clamp(6px, 1.05dvh, 12px) clamp(8px, 1.6vw, 14px);
+}
+
+.wb-emotion-tile-sheet {
+  --tile-radius: 12px;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+}
+
+.wb-emotion-tile-sheet .wb-emotion-tile-label {
+  font-size: clamp(0.875rem, 1.95dvh, 1.0625rem);
+}
+
+.wb-emotion-tile-sheet .wb-emotion-tile-glyph svg {
+  width: clamp(18px, 2.25dvh, 22px);
+  height: clamp(18px, 2.25dvh, 22px);
+}
+
+@media (min-width: 640px) {
+  .wb-latest-emotion-surface-today {
+    min-height: clamp(102px, 13dvh, 124px);
+  }
+
+  .wb-latest-emotion-titlebox-today {
+    min-height: clamp(72px, 9.5dvh, 92px);
+  }
+
+  .wb-emotion-tile-inline {
+    min-height: clamp(38px, calc((100dvh - 432px) / 4), 46px);
+  }
+
+  .wb-emotion-matrix-sheet {
+    gap: clamp(8px, 1.25dvh, 14px) clamp(12px, 1.8vw, 18px);
+  }
+}
+
+html[data-reading-comfort="true"] .wb-emotion-tile-inline {
+  min-height: clamp(38px, calc((100dvh - 388px) / 8), 46px);
+}
+
+@media (min-width: 640px) {
+  html[data-reading-comfort="true"] .wb-emotion-tile-inline {
+    min-height: 46px;
+  }
+}
+
+.wb-emotion-tile-halo {
+  position: absolute;
+  inset: var(--tile-glow-spread);
+  border-radius: calc(var(--tile-radius, 10px) + 2px);
+  background-color: var(--tile-emotion-glow);
+  filter: blur(var(--tile-glow-blur));
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  will-change: transform, opacity;
+  animation: emotion-tile-glow-settle 8s cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+/* Crisp 1.5px Quadrant Border Pulse (250ms GPU-composited flash on press, scales cleanly to any tile radius) */
+@keyframes wb-quadrant-border-pulse {
+  0% {
+    opacity: 0.96;
+    transform: scale(0.992);
+  }
+  42% {
+    opacity: 1;
+    transform: scale(1.012);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.024);
+  }
+}
+
+.wb-emotion-border-pulse {
+  position: absolute;
+  inset: -1.5px;
+  border-radius: calc(var(--tile-radius, 10px) + 1px);
+  border: 1.5px solid var(--tile-pulse-color);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tile-pulse-color) 42%, transparent);
+  pointer-events: none;
+  z-index: 20;
+  will-change: transform, opacity;
+  animation: wb-quadrant-border-pulse 250ms cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
+}
+
+/* ==========================================================================
+   Four Distinct Emotion-Group Tap Animations (Quick Check-In & Instant Check-In)
+   - Strictly GPU-composited (transform + opacity only); zero layout shift
+   - Alternating A/B keyframes restart cleanly on consecutive taps of the same tile
+   - will-change is applied only while animating and released on idle
+   ========================================================================== */
+
+/* 1. Yellow / High Energy ("Spark Pop / Kinetic Lift") — 420ms */
+@keyframes wb-tile-yellow-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(0.97, 0.97, 1);
+  }
+  34% {
+    transform: translate3d(0, -2.5px, 0) scale3d(1.055, 1.055, 1);
+  }
+  66% {
+    transform: translate3d(0, 0.5px, 0) scale3d(0.99, 0.99, 1);
+  }
+  84% {
+    transform: translate3d(0, -0.5px, 0) scale3d(1.01, 1.01, 1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes wb-tile-yellow-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(0.97, 0.97, 1);
+  }
+  34% {
+    transform: translate3d(0, -2.5px, 0) scale3d(1.055, 1.055, 1);
+  }
+  66% {
+    transform: translate3d(0, 0.5px, 0) scale3d(0.99, 0.99, 1);
+  }
+  84% {
+    transform: translate3d(0, -0.5px, 0) scale3d(1.01, 1.01, 1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+/* 2. Green / Low Energy ("Warm Breath / Gentle Float") — 560ms */
+@keyframes wb-tile-green-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(0.99, 0.99, 1);
+    opacity: 0.96;
+  }
+  45% {
+    transform: translate3d(0, -1.25px, 0) scale3d(1.026, 1.026, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes wb-tile-green-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(0.99, 0.99, 1);
+    opacity: 0.96;
+  }
+  45% {
+    transform: translate3d(0, -1.25px, 0) scale3d(1.026, 1.026, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+/* 3. Blue / Low Energy ("Soft Sink & Quiet Rise") — 600ms */
+@keyframes wb-tile-blue-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+  32% {
+    transform: translate3d(0, 2.25px, 0) scale3d(0.982, 0.982, 1);
+    opacity: 0.9;
+  }
+  58% {
+    transform: translate3d(0, 1.5px, 0) scale3d(0.988, 0.988, 1);
+    opacity: 0.94;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes wb-tile-blue-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+  32% {
+    transform: translate3d(0, 2.25px, 0) scale3d(0.982, 0.982, 1);
+    opacity: 0.9;
+  }
+  58% {
+    transform: translate3d(0, 1.5px, 0) scale3d(0.988, 0.988, 1);
+    opacity: 0.94;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+/* 4. Red / High-Activation & Tension ("Steady Ground / Controlled Dampen") — 380ms */
+@keyframes wb-tile-red-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  22% {
+    transform: translate3d(-1.75px, 0, 0) scale3d(0.98, 0.98, 1);
+  }
+  48% {
+    transform: translate3d(1.25px, 0, 0) scale3d(0.99, 0.99, 1);
+  }
+  72% {
+    transform: translate3d(-0.5px, 0, 0) scale3d(0.997, 0.997, 1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes wb-tile-red-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  22% {
+    transform: translate3d(-1.75px, 0, 0) scale3d(0.98, 0.98, 1);
+  }
+  48% {
+    transform: translate3d(1.25px, 0, 0) scale3d(0.99, 0.99, 1);
+  }
+  72% {
+    transform: translate3d(-0.5px, 0, 0) scale3d(0.997, 0.997, 1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+.wb-emotion-tile[data-quadrant="yellow"][data-tap-anim="a"] {
+  will-change: transform;
+  animation: wb-tile-yellow-a 420ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+.wb-emotion-tile[data-quadrant="yellow"][data-tap-anim="b"] {
+  will-change: transform;
+  animation: wb-tile-yellow-b 420ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+.wb-emotion-tile[data-quadrant="green"][data-tap-anim="a"] {
+  will-change: transform, opacity;
+  animation: wb-tile-green-a 560ms cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+.wb-emotion-tile[data-quadrant="green"][data-tap-anim="b"] {
+  will-change: transform, opacity;
+  animation: wb-tile-green-b 560ms cubic-bezier(0.37, 0, 0.63, 1) 1 both;
+}
+
+.wb-emotion-tile[data-quadrant="blue"][data-tap-anim="a"] {
+  will-change: transform, opacity;
+  animation: wb-tile-blue-a 600ms cubic-bezier(0.33, 0, 0.2, 1) 1 both;
+}
+
+.wb-emotion-tile[data-quadrant="blue"][data-tap-anim="b"] {
+  will-change: transform, opacity;
+  animation: wb-tile-blue-b 600ms cubic-bezier(0.33, 0, 0.2, 1) 1 both;
+}
+
+.wb-emotion-tile[data-quadrant="red"][data-tap-anim="a"] {
+  will-change: transform;
+  animation: wb-tile-red-a 380ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+.wb-emotion-tile[data-quadrant="red"][data-tap-anim="b"] {
+  will-change: transform;
+  animation: wb-tile-red-b 380ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+.dark .wb-emotion-tile {
+  --tile-glow-max: 0.11;
+  --tile-glow-blur: 6px;
+  --tile-glow-spread: -1px;
+}
+
+html[data-calm-mode="true"] .wb-emotion-tile {
+  --tile-glow-max: 0.08;
+  --tile-glow-blur: 6px;
+  --tile-glow-spread: -1px;
+}
+
+html.dark[data-calm-mode="true"] .wb-emotion-tile {
+  --tile-glow-max: 0.09;
+  --tile-glow-blur: 6px;
+  --tile-glow-spread: -1px;
+}
+
+html[data-high-contrast="true"] .wb-emotion-tile,
+html[data-calm-mode="true"][data-high-contrast="true"] .wb-emotion-tile {
+  --tile-glow-max: 0.10;
+  --tile-glow-blur: 6px;
+  --tile-glow-spread: -1px;
+}
+
+html.dark[data-high-contrast="true"] .wb-emotion-tile,
+html.dark[data-calm-mode="true"][data-high-contrast="true"] .wb-emotion-tile {
+  --tile-glow-max: 0.12;
+  --tile-glow-blur: 6px;
+  --tile-glow-spread: -1px;
+}
+
+/* Reduce Motion: instant 0ms inspect open/close & no animated glow burst */
+html[data-reduce-motion="true"] .wb-latest-emotion-card,
+html[data-reduce-motion="true"] .wb-latest-emotion-surface,
+html[data-reduce-motion="true"] .wb-latest-emotion-info-btn,
+html[data-reduce-motion="true"] .wb-latest-emotion-info-circle,
+html[data-reduce-motion="true"] .wb-emotion-inspect-grid,
+html[data-reduce-motion="true"] .wb-emotion-inspect-inner {
+  transition-duration: 0ms !important;
+  transition-delay: 0ms !important;
+}
+
+html[data-reduce-motion="true"] .wb-latest-emotion-card::before,
+html[data-reduce-motion="true"] .wb-latest-emotion-surface::after,
+html[data-reduce-motion="true"] .wb-emotion-tile-halo,
+html[data-reduce-motion="true"] .wb-emotion-border-pulse {
+  animation: none !important;
+  opacity: 0 !important;
+  transform: scale(1) !important;
+}
+
+html[data-reduce-motion="true"] .wb-latest-blend-border::before {
+  animation: none !important;
+  transform: translate3d(-50%, -50%, 0) !important;
+  will-change: auto !important;
+}
+
+html[data-reduce-motion="true"] .wb-latest-emotion-label,
+html[data-reduce-motion="true"] .wb-latest-emotion-text,
+html[data-reduce-motion="true"] .wb-emotion-tile[data-tap-anim] {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  will-change: auto !important;
+}
+
+html[data-reduce-motion="true"] .wb-emotion-tile,
+html[data-reduce-motion="true"] .wb-emotion-tile-fill {
+  transition-duration: 0ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) .wb-latest-emotion-card,
+  html:not([data-reduce-motion="false"]) .wb-latest-emotion-surface,
+  html:not([data-reduce-motion="false"]) .wb-latest-emotion-info-btn,
+  html:not([data-reduce-motion="false"]) .wb-latest-emotion-info-circle,
+  html:not([data-reduce-motion="false"]) .wb-emotion-inspect-grid,
+  html:not([data-reduce-motion="false"]) .wb-emotion-inspect-inner,
+  html:not([data-reduce-motion="false"]) .wb-emotion-tile,
+  html:not([data-reduce-motion="false"]) .wb-emotion-tile-fill {
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  html:not([data-reduce-motion="false"]) .wb-latest-emotion-card::before,
+  html:not([data-reduce-motion="false"]) .wb-latest-emotion-surface::after,
+  html:not([data-reduce-motion="false"]) .wb-emotion-tile-halo,
+  html:not([data-reduce-motion="false"]) .wb-emotion-border-pulse {
+    animation: none !important;
+    opacity: 0 !important;
+    transform: scale(1) !important;
+  }
+
+  html:not([data-reduce-motion="false"]) .wb-latest-blend-border::before {
+    animation: none !important;
+    transform: translate3d(-50%, -50%, 0) !important;
+    will-change: auto !important;
+  }
+
+  html:not([data-reduce-motion="false"]) .wb-latest-emotion-label,
+  html:not([data-reduce-motion="false"]) .wb-latest-emotion-text,
+  html:not([data-reduce-motion="false"]) .wb-emotion-tile[data-tap-anim] {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    will-change: auto !important;
+  }
+}
+
+/* ==========================================================================
+   15. Pattern 3: Expanding Active-Tab Capsule Dock (Integrated +)
+   - Single centered floating Liquid Glass capsule across all viewports
+   - Active tab expands smoothly (250ms cubic-bezier(0.4, 0, 0.2, 1))
+   - Inactive tabs stay icon-only with 48px invisible touch targets
+   - Integrated (+) orb anchored flush right with crisp static finish (no glow)
+   - Full Light, Dark, Calm, High-Contrast, Reduce Transparency, Reading Comfort & Reduce Motion parity
+   ========================================================================== */
+
+.wb-capsule-dock-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--capsule-dock-lift, 16px) + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 390px;
+  height: var(--capsule-dock-height, 60px);
+  z-index: var(--z-bottom-dock);
+  container-type: inline-size;
+  container-name: capsule-dock;
+  transition: opacity 180ms ease;
+}
+
+@media (min-width: 640px) {
+  .wb-capsule-dock-wrap {
+    max-width: 440px;
+  }
+}
+
+html[data-reading-comfort="true"] .wb-capsule-dock-wrap {
+  width: calc(100% - 20px);
+  max-width: 472px;
+}
+
+.wb-capsule-dock-wrap[data-locked="true"] {
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.wb-capsule-dock {
+  /* Light Mode Tokens */
+  --capsule-bg: rgba(254, 254, 254, 0.90);
+  --capsule-border: rgba(191, 178, 255, 0.62);
+  --capsule-specular: rgba(255, 255, 255, 0.94);
+  --capsule-shadow:
+    0 14px 32px -10px rgba(26, 0, 77, 0.16),
+    0 3px 10px -2px rgba(9, 0, 26, 0.06);
+  --capsule-divider: rgba(26, 0, 77, 0.12);
+  --capsule-pill-bg: color-mix(in srgb, var(--palette-soft-lavender) 32%, var(--palette-near-white));
+  --capsule-pill-border: rgba(58, 0, 229, 0.24);
+  --capsule-pill-fg: var(--palette-electric-indigo);
+  --capsule-pill-shadow: none;
+  --capsule-inactive-fg: #5D5578;
+  --capsule-inactive-hover-fg: var(--palette-deep-plum);
+  --capsule-inactive-hover-bg: rgba(58, 0, 229, 0.07);
+  --capsule-plus-bg: var(--palette-electric-indigo);
+  --capsule-plus-fg: var(--palette-near-white);
+  --capsule-plus-border: rgba(255, 255, 255, 0.24);
+  --capsule-tooltip-bg: var(--palette-deep-plum);
+  --capsule-tooltip-fg: var(--palette-near-white);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 100%;
+  padding: 0 8px 0 12px;
+  border-radius: 9999px;
+  background: var(--capsule-bg);
+  border: 1px solid var(--capsule-border);
+  backdrop-filter: blur(20px) saturate(135%);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  box-shadow: inset 0 1px 0 var(--capsule-specular), var(--capsule-shadow);
+  isolation: isolate;
+}
+
+/* Dark Mode Capsule Tokens — Crisp hairline separation & low paint overhead */
+.dark .wb-capsule-dock {
+  --capsule-bg: rgba(18, 22, 21, 0.88);
+  --capsule-border: rgba(254, 254, 254, 0.10);
+  --capsule-specular: rgba(254, 254, 254, 0.06);
+  --capsule-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.55);
+  --capsule-divider: rgba(254, 254, 254, 0.10);
+  --capsule-pill-bg: rgba(47, 209, 158, 0.14);
+  --capsule-pill-border: rgba(92, 224, 184, 0.32);
+  --capsule-pill-fg: #5CE0B8;
+  --capsule-pill-shadow: none;
+  --capsule-inactive-fg: rgba(235, 240, 238, 0.58);
+  --capsule-inactive-hover-fg: #F2F5F2;
+  --capsule-inactive-hover-bg: rgba(191, 178, 255, 0.10);
+  --capsule-plus-bg: #2FD19E;
+  --capsule-plus-fg: var(--palette-near-black);
+  --capsule-plus-border: rgba(255, 255, 255, 0.18);
+  --capsule-tooltip-bg: #1E1636;
+  --capsule-tooltip-fg: var(--palette-near-white);
+}
+
+/* Calm Mode: subdue luminous mint/indigo hues to soft lavender & muted plum */
+html[data-calm-mode="true"] .wb-capsule-dock {
+  --capsule-pill-bg: #ECE8F8;
+  --capsule-pill-border: rgba(61, 53, 120, 0.24);
+  --capsule-pill-fg: #3D3578;
+  --capsule-pill-shadow: none;
+  --capsule-plus-bg: #3D3578;
+  --capsule-plus-fg: var(--palette-near-white);
+}
+
+html.dark[data-calm-mode="true"] .wb-capsule-dock {
+  --capsule-pill-bg: rgba(191, 178, 255, 0.14);
+  --capsule-pill-border: rgba(191, 178, 255, 0.30);
+  --capsule-pill-fg: var(--palette-soft-lavender);
+  --capsule-pill-shadow: none;
+  --capsule-plus-bg: var(--palette-soft-lavender);
+  --capsule-plus-fg: var(--palette-near-black);
+}
+
+/* High-Contrast Mode: strict WCAG AAA opaque contrast & bold borders */
+html[data-high-contrast="true"] .wb-capsule-dock,
+html[data-calm-mode="true"][data-high-contrast="true"] .wb-capsule-dock {
+  --capsule-bg: var(--palette-near-white);
+  --capsule-border: var(--palette-near-black);
+  --capsule-specular: transparent;
+  --capsule-shadow: 0 8px 20px -8px rgba(9, 0, 26, 0.28);
+  --capsule-divider: var(--palette-near-black);
+  --capsule-pill-bg: var(--palette-deep-plum);
+  --capsule-pill-border: var(--palette-near-black);
+  --capsule-pill-fg: var(--palette-near-white);
+  --capsule-pill-shadow: none;
+  --capsule-inactive-fg: var(--palette-near-black);
+  --capsule-inactive-hover-fg: var(--palette-deep-plum);
+  --capsule-inactive-hover-bg: #EAE5FA;
+  --capsule-plus-bg: var(--palette-deep-plum);
+  --capsule-plus-fg: var(--palette-near-white);
+  --capsule-plus-border: var(--palette-near-black);
+  border-width: 1.5px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.dark[data-high-contrast="true"] .wb-capsule-dock {
+  --capsule-bg: var(--palette-near-black);
+  --capsule-border: var(--palette-near-white);
+  --capsule-specular: transparent;
+  --capsule-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.72);
+  --capsule-divider: rgba(254, 254, 254, 0.56);
+  --capsule-pill-bg: var(--palette-deep-plum);
+  --capsule-pill-border: var(--palette-chartreuse);
+  --capsule-pill-fg: var(--palette-near-white);
+  --capsule-pill-shadow: none;
+  --capsule-inactive-fg: #E6E8F2;
+  --capsule-inactive-hover-fg: var(--palette-chartreuse);
+  --capsule-inactive-hover-bg: rgba(254, 254, 254, 0.12);
+  --capsule-plus-bg: var(--palette-chartreuse);
+  --capsule-plus-fg: var(--palette-near-black);
+  --capsule-plus-border: var(--palette-near-white);
+  border-width: 1.5px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.dark[data-calm-mode="true"][data-high-contrast="true"] .wb-capsule-dock {
+  --capsule-pill-border: var(--palette-soft-lavender);
+  --capsule-inactive-hover-fg: var(--palette-soft-lavender);
+  --capsule-plus-bg: var(--palette-soft-lavender);
+  --capsule-plus-fg: var(--palette-near-black);
+}
+
+/* Reduce Transparency Mode: remove all blur/specular layers, solid #FEFEFE / #09001A + 1.5px border */
+html[data-reduce-transparency="true"] .wb-capsule-dock {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--palette-near-white) !important;
+  border: 1.5px solid var(--border-strong) !important;
+  box-shadow: 0 6px 18px -8px rgba(9, 0, 26, 0.2) !important;
+}
+
+html.dark[data-reduce-transparency="true"] .wb-capsule-dock {
+  background: var(--palette-near-black) !important;
+  border: 1.5px solid rgba(191, 178, 255, 0.45) !important;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.65) !important;
+}
+
+html[data-reduce-transparency="true"] .wb-capsule-active-pill {
+  box-shadow: none !important;
+}
+
+html.dark[data-reduce-transparency="true"] .wb-capsule-active-pill {
+  background: var(--palette-deep-plum) !important;
+  border-color: var(--palette-soft-lavender) !important;
+}
+
+html.dark[data-reduce-transparency="true"] .wb-capsule-tab[data-active="true"] {
+  color: var(--palette-near-white) !important;
+}
+
+/* Tabs Row */
+.wb-capsule-tabs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  gap: 2px;
+}
+
+/* GPU-Composited Sliding Active Tab Highlight Pill (shared layoutId transform) */
+.wb-capsule-active-pill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 9999px;
+  background: var(--capsule-pill-bg);
+  border: 1px solid var(--capsule-pill-border);
+  box-shadow: var(--capsule-pill-shadow);
+  pointer-events: none;
+}
+
+/* Individual Tab Button (Inactive icon-only <-> Active expanding pill) */
+.wb-capsule-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0%;
+  min-width: 40px;
+  height: 44px;
+  padding: 0 8px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--capsule-inactive-fg);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 160ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Invisible vertical 48px touch expansion bounded horizontally so compact tabs never overlap neighbors */
+.wb-capsule-tab::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+  min-height: 48px;
+  border-radius: 9999px;
+}
+
+.wb-capsule-tab:hover:not([data-active="true"]):not([aria-disabled="true"]) {
+  color: var(--capsule-inactive-hover-fg);
+  background-color: var(--capsule-inactive-hover-bg);
+}
+
+.wb-capsule-tab[data-active="true"] {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  background: transparent;
+  border-color: transparent;
+  color: var(--capsule-pill-fg);
+}
+
+.wb-capsule-tab-icon {
+  position: relative;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Instant layout geometry so GPU sliding pill measures exact target width; crisp opacity reveal */
+.wb-capsule-label-wrap {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 0fr;
+  opacity: 0;
+  margin-left: 0;
+  transition: opacity 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wb-capsule-tab[data-active="true"] .wb-capsule-label-wrap {
+  grid-template-columns: 1fr;
+  opacity: 1;
+  margin-left: 7px;
+}
+
+.wb-capsule-label {
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+/* Quiet Hover / Focus-Visible Tooltip for Icon-Only Inactive Tabs */
+.wb-capsule-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: var(--capsule-tooltip-bg);
+  color: var(--capsule-tooltip-fg);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 6px 16px -6px rgba(9, 0, 26, 0.45);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+@media (hover: hover) {
+  .wb-capsule-tab:hover:not([data-active="true"]) .wb-capsule-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.wb-capsule-tab:focus-visible:not([data-active="true"]) .wb-capsule-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Vertical Hairline Divider before Integrated (+) Orb */
+.wb-capsule-divider {
+  width: 1px;
+  height: 24px;
+  flex-shrink: 0;
+  background: var(--capsule-divider);
+}
+
+/* Integrated Quick-Action (+) Orb — Flush Right Edge */
+.wb-capsule-plus-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--capsule-plus-bg);
+  color: var(--capsule-plus-fg);
+  border: 1px solid var(--capsule-plus-border);
+  cursor: pointer;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 150ms ease;
+}
+
+.wb-capsule-plus-btn:hover:not([aria-disabled="true"]) {
+  opacity: 0.9;
+}
+
+.wb-capsule-plus-btn:active:not([aria-disabled="true"]) {
+  transform: scale(0.93);
+}
+
+/* Container Queries for Compact Viewports (320px–380px) & Reading Comfort */
+@container capsule-dock (max-width: 380px) {
+  .wb-capsule-dock {
+    padding: 0 7px 0 9px;
+    gap: 6px;
+  }
+
+  .wb-capsule-tab {
+    min-width: 34px;
+    height: 42px;
+    padding: 0 5px;
+  }
+
+  .wb-capsule-tab[data-active="true"] {
+    padding: 9px 13px;
+  }
+
+  .wb-capsule-tab[data-active="true"] .wb-capsule-label-wrap {
+    margin-left: 6px;
+  }
+
+  .wb-capsule-label {
+    font-size: 0.78rem;
+  }
+
+  .wb-capsule-plus-btn {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+@container capsule-dock (max-width: 332px) {
+  .wb-capsule-dock {
+    padding: 0 6px 0 7px;
+    gap: 4px;
+  }
+
+  .wb-capsule-tabs {
+    gap: 1px;
+  }
+
+  .wb-capsule-tab {
+    min-width: 30px;
+    height: 40px;
+    padding: 0 3px;
+  }
+
+  .wb-capsule-tab[data-active="true"] {
+    padding: 8px 10px;
+  }
+
+  .wb-capsule-tab[data-active="true"] .wb-capsule-label-wrap {
+    margin-left: 5px;
+  }
+
+  .wb-capsule-tab-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .wb-capsule-label {
+    font-size: 0.75rem;
+  }
+
+  .wb-capsule-plus-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Reduce Motion: snap active pill immediately with 0ms delay */
+html[data-reduce-motion="true"] .wb-capsule-dock-wrap,
+html[data-reduce-motion="true"] .wb-capsule-tab,
+html[data-reduce-motion="true"] .wb-capsule-label-wrap,
+html[data-reduce-motion="true"] .wb-capsule-tooltip,
+html[data-reduce-motion="true"] .wb-capsule-plus-btn {
+  transition: none !important;
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) .wb-capsule-dock-wrap,
+  html:not([data-reduce-motion="false"]) .wb-capsule-tab,
+  html:not([data-reduce-motion="false"]) .wb-capsule-label-wrap,
+  html:not([data-reduce-motion="false"]) .wb-capsule-tooltip,
+  html:not([data-reduce-motion="false"]) .wb-capsule-plus-btn {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   16. Dual-Edge Scroll-Linked Atmospheric Depth System
+   - Non-interactive Top & Bottom Progressive Edge Veils sitting directly beneath
+     their respective taskbars (never wrapping them, preventing GPU nested
+     backdrop-filter dropouts).
+   - Directional 60fps GPU-composited push-back on [data-edge-recede] cards.
+   - Zero per-card filter: blur() or brightness(); idle cards clear inline vars
+     so resting typography stays razor-sharp with no stacking-context traps.
+   - Full Light, Dark, Calm, High-Contrast (tight 18px feather),
+     Reduce Transparency (blur stripped), & Reduce Motion parity.
+   ========================================================================== */
+
+.wb-edge-veil-top,
+.wb-edge-veil-bottom {
+  position: fixed;
+  inset-inline: 0;
+  pointer-events: none;
+  touch-action: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.wb-edge-veil-top[data-scroll-active="true"]:not([data-hidden="true"]),
+.wb-edge-veil-bottom[data-scroll-active="true"]:not([data-hidden="true"]) {
+  opacity: 1;
+}
+
+.wb-edge-veil-top[data-hidden="true"],
+.wb-edge-veil-bottom[data-hidden="true"] {
+  opacity: 0;
+}
+
+/* A. Soft Top Scroll Edge Fade — sits directly beneath fixed WELLBE+ top navbar */
+.wb-edge-veil-top {
+  top: 0;
+  z-index: calc(var(--z-sticky-header) - 1);
+  height: calc(
+    var(--top-bar-height, 56px) + env(safe-area-inset-top, 0px) + var(--top-veil-feather, 36px)
+  );
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--surface-canvas) 90%, transparent) 0%,
+    color-mix(in srgb, var(--surface-canvas) 74%, transparent) 46%,
+    color-mix(in srgb, var(--surface-canvas) 36%, transparent) 74%,
+    color-mix(in srgb, var(--surface-canvas) 10%, transparent) 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to top,
+    transparent 0%,
+    rgba(0, 0, 0, 0.45) 30%,
+    #000 68%,
+    #000 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to top,
+    transparent 0%,
+    rgba(0, 0, 0, 0.45) 30%,
+    #000 68%,
+    #000 100%
+  );
+}
+
+/* B. Soft Bottom Scroll Edge Fade — sits directly beneath floating bottom capsule dock */
+.wb-edge-veil-bottom {
+  bottom: 0;
+  z-index: calc(var(--z-bottom-dock) - 1);
+  height: calc(
+    var(--capsule-dock-height, 64px) + var(--capsule-dock-lift, 16px) +
+      env(safe-area-inset-bottom, 0px) + var(--bottom-veil-feather, 44px)
+  );
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--surface-canvas) 12%, transparent) 22%,
+    color-mix(in srgb, var(--surface-canvas) 46%, transparent) 50%,
+    color-mix(in srgb, var(--surface-canvas) 80%, transparent) 76%,
+    color-mix(in srgb, var(--surface-canvas) 92%, transparent) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.45) 28%,
+    #000 66%,
+    #000 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.45) 28%,
+    #000 66%,
+    #000 100%
+  );
+}
+
+/* Dark Mode: quiet obsidian-slate scroll-active edge fades (zero muddy halo or resting band) */
+.dark .wb-edge-veil-top {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--surface-canvas) 88%, transparent) 0%,
+    color-mix(in srgb, var(--surface-canvas) 72%, transparent) 48%,
+    color-mix(in srgb, var(--surface-canvas) 36%, transparent) 76%,
+    color-mix(in srgb, var(--surface-canvas) 10%, transparent) 92%,
+    transparent 100%
+  );
+}
+
+.dark .wb-edge-veil-bottom {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--surface-canvas) 12%, transparent) 24%,
+    color-mix(in srgb, var(--surface-canvas) 44%, transparent) 52%,
+    color-mix(in srgb, var(--surface-canvas) 78%, transparent) 78%,
+    color-mix(in srgb, var(--surface-canvas) 90%, transparent) 100%
+  );
+}
+
+/* High-Contrast Mode: tighten both feathers to 18px past each taskbar rim for WCAG AAA legibility */
+html[data-high-contrast="true"] {
+  --top-veil-feather: 18px;
+  --bottom-veil-feather: 18px;
+}
+
+html[data-high-contrast="true"] .wb-edge-veil-top,
+html[data-high-contrast="true"] .wb-edge-veil-bottom,
+html[data-reduce-transparency="true"] .wb-edge-veil-top,
+html[data-reduce-transparency="true"] .wb-edge-veil-bottom {
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+/* Subtle Directional GPU-Composited Scroll Recession (Strictly gentle scale + light opacity) */
+[data-edge-recede][data-edge-dir="top"] {
+  transform-origin: center bottom;
+  transform: scale(calc(1 - var(--edge-recede, 0) * 0.022));
+  opacity: calc(1 - var(--edge-recede, 0) * 0.12);
+  will-change: transform, opacity;
+}
+
+[data-edge-recede][data-edge-dir="bottom"] {
+  transform-origin: center top;
+  transform: scale(calc(1 - var(--edge-recede, 0) * 0.022));
+  opacity: calc(1 - var(--edge-recede, 0) * 0.12);
+  will-change: transform, opacity;
+}
+
+/* Elastic Overscroll Stage (isolated wrapper, zero transform at rest) */
+.wb-overscroll-stage {
+  will-change: auto;
+}
+
+/* Reduce Motion: disable all 3D push-back transforms while preserving calm static veils */
+html[data-reduce-motion="true"] [data-edge-recede],
+html[data-reduce-motion="true"] [data-edge-recede][data-edge-dir="top"],
+html[data-reduce-motion="true"] [data-edge-recede][data-edge-dir="bottom"] {
+  transform: none !important;
+  opacity: 1 !important;
+  will-change: auto !important;
+}
+
+html[data-reduce-motion="true"] .wb-edge-veil-top,
+html[data-reduce-motion="true"] .wb-edge-veil-bottom {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) [data-edge-recede],
+  html:not([data-reduce-motion="false"]) [data-edge-recede][data-edge-dir="top"],
+  html:not([data-reduce-motion="false"]) [data-edge-recede][data-edge-dir="bottom"] {
+    transform: none !important;
+    opacity: 1 !important;
+    will-change: auto !important;
+  }
+
+  html:not([data-reduce-motion="false"]) .wb-edge-veil-top,
+  html:not([data-reduce-motion="false"]) .wb-edge-veil-bottom {
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+   17. Instant Check-In Overlay — Anchored Single-Layer Pop-Up & Exit Motion
+   - Optically anchored toward bottom-right (+) trigger (transform-origin: 88% 100%)
+   - Strictly compositor-only properties (transform & opacity); zero scrim blur
+   - Clears transform: none and will-change: auto once settled for crisp text
+   - Surgical (+) glyph rotate(45deg) feedback over 180ms ease-out
+   - Instant 0ms snap in Reduce Motion; crisp opaque surfaces in Reduce Transparency
+   ========================================================================== */
+
+/* (+) Trigger Icon Rotation Feedback (Spring-Physics GPU Transform) */
+.wb-capsule-plus-icon {
+  transform: rotate(0deg);
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wb-capsule-plus-btn[data-open="true"] .wb-capsule-plus-icon {
+  transform: rotate(45deg);
+}
+
+@keyframes wb-quick-checkin-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wb-quick-checkin-scrim-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes wb-quick-checkin-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.965);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes wb-quick-checkin-exit {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.975);
+  }
+}
+
+/* Fully Opaque Canvas Backdrop Scrim (Zero bleed-through behind Instant Check-In or beneath navbar) */
+.wb-quick-checkin-scrim {
+  background-color: var(--surface-canvas);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  isolation: isolate;
+}
+
+.wb-quick-checkin-scrim[data-phase="entering"] {
+  will-change: opacity;
+  animation: wb-quick-checkin-scrim-in 180ms ease-out forwards;
+}
+
+.wb-quick-checkin-scrim[data-phase="open"] {
+  opacity: 1;
+  will-change: auto;
+}
+
+.wb-quick-checkin-scrim[data-phase="exiting"] {
+  pointer-events: none;
+  will-change: opacity;
+  animation: wb-quick-checkin-scrim-out 140ms ease-in forwards;
+}
+
+/* Unified Single-Layer Overlay Card (Anchored toward bottom-right + trigger) */
+.wb-quick-checkin-card {
+  transform-origin: 88% 100%;
+  background-color: var(--surface-canvas);
+  color: var(--ink-primary);
+  box-shadow: 0 20px 44px -16px rgba(9, 0, 26, 0.28);
+}
+
+.dark .wb-quick-checkin-card {
+  box-shadow: inset 0 1px 0 rgba(254, 254, 254, 0.06), 0 10px 24px -12px rgba(0, 0, 0, 0.52);
+}
+
+html[data-reduce-transparency="true"] .wb-quick-checkin-card,
+html[data-high-contrast="true"] .wb-quick-checkin-card {
+  background-color: var(--surface-card);
+  border-color: var(--border-strong);
+  box-shadow: none;
+}
+
+.wb-quick-checkin-card[data-phase="entering"] {
+  will-change: transform, opacity;
+  animation: wb-quick-checkin-enter 200ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Resting state clears transform & will-change so all 16 labels stay razor-sharp */
+.wb-quick-checkin-card[data-phase="open"] {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+.wb-quick-checkin-card[data-phase="exiting"] {
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: wb-quick-checkin-exit 150ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+/* Reduce Motion: instant 0ms snap open/close & zero (+) icon rotation */
+html[data-reduce-motion="true"] .wb-quick-checkin-scrim,
+html[data-reduce-motion="true"] .wb-quick-checkin-card {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+html[data-reduce-motion="true"] .wb-capsule-plus-icon,
+html[data-reduce-motion="true"] .wb-capsule-plus-btn[data-open="true"] .wb-capsule-plus-icon {
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Shared Overlay Header Close Button (Exact 44x44px size parity across Settings & Instant Check-In) */
+.wb-overlay-close-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 90ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.wb-overlay-close-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.wb-overlay-close-btn:focus-visible {
+  outline: var(--focus-ring-width, 2.5px) solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+html[data-reduce-motion="true"] .wb-overlay-close-btn {
+  transition: none !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) .wb-quick-checkin-scrim,
+  html:not([data-reduce-motion="false"]) .wb-quick-checkin-card,
+  html:not([data-reduce-motion="false"]) .wb-overlay-close-btn {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  html:not([data-reduce-motion="false"]) .wb-capsule-plus-icon,
+  html:not([data-reduce-motion="false"]) .wb-capsule-plus-btn[data-open="true"] .wb-capsule-plus-icon {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   17. Contextual Routines High-Contrast Support
+   ========================================================================== */
+html[data-high-contrast="true"] .wb-routine-context-banner {
+  border-width: 1.5px;
+}
+
+/* ==========================================================================
+   18. Settings Below-Navbar Bottom-Up Drawer, Interactive Grab & Opaque Scrim
+   ========================================================================== */
+header[data-top-utility-bar="true"][data-overlay-open="true"] {
+  background: var(--surface-card) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom-color: var(--border-hairline);
+  box-shadow: 0 1px 0 var(--border-hairline);
+}
+
+/* Deep dark-black scrim behind Settings drawer that smoothly fades 0 -> 1 on open and 1 -> 0 on close to reveal the live underlying app screen */
+.wb-settings-scrim {
+  background-color: #000000;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  isolation: isolate;
+}
+
+.wb-settings-drawer {
+  background-color: var(--surface-card);
+  color: var(--ink-primary);
+  box-shadow: 0 -18px 42px -16px rgba(9, 0, 26, 0.28);
+}
+
+.dark .wb-settings-drawer {
+  box-shadow: inset 0 1px 0 rgba(254, 254, 254, 0.06), 0 -8px 24px -12px rgba(0, 0, 0, 0.52);
+}
+
+html[data-reduce-transparency="true"] .wb-settings-drawer,
+html[data-high-contrast="true"] .wb-settings-drawer {
+  background-color: var(--surface-card);
+  border-color: var(--border-strong);
+  box-shadow: none;
+}
+
+.wb-settings-grab-header {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.wb-settings-grab-header:active,
+body.wb-settings-grabbing,
+body.wb-settings-grabbing * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Reduce Motion: instant 0ms open/close */
+html[data-reduce-motion="true"] .wb-settings-scrim,
+html[data-reduce-motion="true"] .wb-settings-drawer {
+  transition: none !important;
+  will-change: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) .wb-settings-scrim,
+  html:not([data-reduce-motion="false"]) .wb-settings-drawer {
+    transition: none !important;
+    will-change: auto !important;
+  }
+}
+
+/* Zero-render Recharts tooltip dismissal on scroll / tap-outside */
+.wb-trends-root[data-tooltips-hidden="true"] .recharts-tooltip-wrapper {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ==========================================================================
+   19. Micro-Staggered Card Entrances (Routines, Mood Log & Trends — First 4 Cards)
+   - GPU-composited opacity + translate3d(0, 6px, 0) over 180ms ease-out
+   - Uses fill-mode: backwards so finished cards release transform/opacity cleanly
+     for scroll-linked edge recession & crisp typography
+   - Automatically bypassed in Reduce Motion mode
+   ========================================================================== */
+@keyframes wb-card-stagger-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.wb-stagger-card {
+  animation: wb-card-stagger-in 180ms ease-out backwards;
+}
+
+.wb-stagger-card[data-stagger="0"] {
+  animation-delay: 0ms;
+}
+
+.wb-stagger-card[data-stagger="1"] {
+  animation-delay: 20ms;
+}
+
+.wb-stagger-card[data-stagger="2"] {
+  animation-delay: 40ms;
+}
+
+.wb-stagger-card[data-stagger="3"] {
+  animation-delay: 60ms;
+}
+
+html[data-reduce-motion="true"] .wb-stagger-card {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) .wb-stagger-card {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   20. Tactile Feedback, Surface & SVG Precision, Typography & Hydration Polish
+   - Strictly CSS-layered; preserves all state logic, RULER hues & drag-scroll
+   - Automatically bypasses scale & hydration motion in Reduce Motion mode
+   ========================================================================== */
+
+/* 20.1 Dark-Surface Font Smoothing & 150ms Hydration Fade-In */
+@keyframes wb-app-hydrate-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#root,
+.wb-app-root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.wb-app-root {
+  animation: wb-app-hydrate-in 150ms ease-out backwards;
+}
+
+/* 20.2 Balanced Heading Wrapping across Cards, Sections & Empty States */
+.wb-app-root h1,
+.wb-app-root h2,
+.wb-app-root h3,
+.wb-app-root h4,
+.wb-settings-drawer h1,
+.wb-settings-drawer h2,
+.wb-settings-drawer h3,
+.wb-quick-checkin-card h2 {
+  text-wrap: balance;
+}
+
+/* 20.3 Lock Scroll Containment (Prevent scroll-chaining / pull-to-refresh bleed) */
+html,
+body,
+main#main-content,
+.wb-settings-drawer,
+.wb-settings-pane,
+.wb-settings-rail,
+.wb-quick-checkin-scrim,
+.wb-quick-checkin-card {
+  overscroll-behavior: contain;
+}
+
+main#main-content,
+.wb-settings-pane {
+  overflow-anchor: none;
+}
+
+/* 20.4 Strip Browser Tap Flashes & Accidental Text Selection (Keep inputs & .select-text selectable) */
+button,
+.wb-emotion-tile,
+.wb-capsule-dock,
+.wb-capsule-tab,
+.wb-capsule-plus-btn,
+.drag-scroll-surface {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea,
+[contenteditable="true"],
+[contenteditable=""],
+.select-text,
+.select-text * {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* 20.5 Eliminate Mobile Double-Tap-to-Zoom Delay on High-Frequency Controls */
+.wb-emotion-tile,
+.wb-routines-root button,
+.wb-capsule-tab,
+.wb-capsule-plus-btn,
+.wb-settings-drawer button {
+  touch-action: manipulation;
+}
+
+/* 20.6 Micro-Press Compression (:active scale(0.98) over 90ms) on Tiles, Routine Cards & Settings Rows */
+.wb-emotion-tile {
+  transition:
+    transform 90ms cubic-bezier(0.2, 0, 0, 1),
+    color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    filter 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wb-routine-card,
+.wb-pane-item-card,
+.wb-pane-toggle-row,
+.wb-bento-header,
+.wb-dock-tile,
+.wb-settings-pane button {
+  transition:
+    transform 90ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.wb-emotion-tile:active:not(:disabled),
+.wb-routine-card:active:not(:has(input:focus, textarea:focus)),
+.wb-pane-item-card:active:not(:has(input:focus, textarea:focus, select:focus)),
+.wb-pane-toggle-row:active:not(:has(input:focus, textarea:focus, select:focus)),
+.wb-bento-header:active:not(:disabled),
+.wb-dock-tile:active:not(:disabled),
+.wb-settings-pane button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* 20.7 Top-Edge Specular Micro-Highlight on Elevated Dark Cards (Zero heavy shadows) */
+.dark .wb-surface,
+.dark .wb-bento-card {
+  box-shadow: inset 0 1px 0 rgba(254, 254, 254, 0.06), var(--shadow-card);
+}
+
+html.dark[data-high-contrast="true"] .wb-surface,
+html.dark[data-high-contrast="true"] .wb-bento-card,
+html.dark[data-reduce-transparency="true"] .wb-surface,
+html.dark[data-reduce-transparency="true"] .wb-bento-card {
+  box-shadow: var(--shadow-card);
+}
+
+/* 20.8 Interactive 1px Hairline Border Brightening on :hover / :active (Zero layout shift) */
+@media (hover: hover) {
+  .wb-surface:hover,
+  .wb-bento-card:hover {
+    border-color: rgba(26, 0, 77, 0.16);
+  }
+
+  .dark .wb-surface:hover,
+  .dark .wb-bento-card:hover,
+  .dark button.border-\[var\(--border-hairline\)\]:not(.wb-emotion-tile):hover,
+  .dark .wb-dock-tile:hover {
+    border-color: rgba(254, 254, 254, 0.16);
+  }
+}
+
+.wb-surface:active,
+.wb-bento-card:active {
+  border-color: rgba(26, 0, 77, 0.2);
+}
+
+.dark .wb-surface:active,
+.dark .wb-bento-card:active,
+.dark button.border-\[var\(--border-hairline\)\]:not(.wb-emotion-tile):active,
+.dark .wb-dock-tile:active {
+  border-color: rgba(254, 254, 254, 0.16);
+}
+
+html[data-high-contrast="true"] .wb-surface:hover,
+html[data-high-contrast="true"] .wb-surface:active,
+html[data-high-contrast="true"] .wb-bento-card:hover,
+html[data-high-contrast="true"] .wb-bento-card:active {
+  border-color: var(--border-hairline);
+}
+
+/* 20.9 Crisp SVG & Chart Strokes (geometricPrecision across 1x & HiDPI screens) */
+.wb-trends-root svg,
+.recharts-surface,
+.recharts-surface path,
+.recharts-surface line,
+.recharts-surface circle,
+svg.lucide,
+.wb-emotion-tile svg,
+.wb-capsule-tab-icon {
+  shape-rendering: geometricPrecision;
+}
+
+/* 20.10 Icon Squish Protection across Emotion Tiles, Mood Log Rows, Bottom Dock & All Lucide Icons */
+svg.lucide,
+.wb-emotion-tile svg,
+.wb-log-row svg,
+.wb-capsule-dock svg {
+  flex-shrink: 0;
+}
+
+/* 20.11 Reduce Motion Safety Guardrail for Hydration Fade & Active Compression */
+html[data-reduce-motion="true"] .wb-app-root {
+  animation: none !important;
+}
+
+html[data-reduce-motion="true"] .wb-emotion-tile:active,
+html[data-reduce-motion="true"] .wb-routine-card:active,
+html[data-reduce-motion="true"] .wb-pane-item-card:active,
+html[data-reduce-motion="true"] .wb-pane-toggle-row:active,
+html[data-reduce-motion="true"] .wb-bento-header:active,
+html[data-reduce-motion="true"] .wb-dock-tile:active,
+html[data-reduce-motion="true"] .wb-settings-pane button:active {
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) .wb-app-root {
+    animation: none !important;
+  }
+
+  html:not([data-reduce-motion="false"]) .wb-emotion-tile:active,
+  html:not([data-reduce-motion="false"]) .wb-routine-card:active,
+  html:not([data-reduce-motion="false"]) .wb-pane-item-card:active,
+  html:not([data-reduce-motion="false"]) .wb-pane-toggle-row:active,
+  html:not([data-reduce-motion="false"]) .wb-bento-header:active,
+  html:not([data-reduce-motion="false"]) .wb-dock-tile:active,
+  html:not([data-reduce-motion="false"]) .wb-settings-pane button:active {
+    transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   21. Non-Blocking Toast / Quick Undo Banner Motion (<=5s, 200ms GPU Exit)
+   - GPU-composited opacity + transform only (zero layout animation)
+   - Instant / minimal 80ms opacity-only fade in Reduce Motion
+   ========================================================================== */
+@keyframes wb-toast-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes wb-toast-exit {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.98);
+  }
+}
+
+@keyframes wb-toast-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wb-toast-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.wb-toast-banner {
+  will-change: transform, opacity;
+  animation: wb-toast-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.wb-toast-banner[data-exiting="true"] {
+  animation: wb-toast-exit 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+html[data-reduce-motion="true"] .wb-toast-banner {
+  will-change: opacity;
+  animation: wb-toast-fade-in 80ms ease-out both;
+}
+
+html[data-reduce-motion="true"] .wb-toast-banner[data-exiting="true"] {
+  animation: wb-toast-fade-out 80ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-reduce-motion="false"]) .wb-toast-banner {
+    will-change: opacity;
+    animation: wb-toast-fade-in 80ms ease-out both;
+  }
+
+  html:not([data-reduce-motion="false"]) .wb-toast-banner[data-exiting="true"] {
+    animation: wb-toast-fade-out 80ms ease-out forwards;
+  }
+}
+
+
+
+
