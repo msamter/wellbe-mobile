@@ -316,10 +316,11 @@ const ToastHost = React.memo(
             {toast.action && (
               <button
                 type="button"
+                data-no-drag-scroll="true"
                 disabled={isExiting}
                 tabIndex={isExiting ? -1 : 0}
                 onClick={handleActionClick}
-                className="min-h-[36px] rounded-xl px-3 text-xs font-semibold transition-colors"
+                className="min-h-[44px] rounded-xl px-3.5 text-xs font-semibold transition-colors"
                 style={{
                   backgroundColor: 'var(--accent-primary)',
                   color: 'var(--accent-primary-ink)',
@@ -330,13 +331,14 @@ const ToastHost = React.memo(
             )}
             <button
               type="button"
+              data-no-drag-scroll="true"
               disabled={isExiting}
               tabIndex={isExiting ? -1 : 0}
               onClick={() => dismiss(false)}
               aria-label="Dismiss notification"
-              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded-lg text-[var(--ink-muted)] hover:bg-[var(--surface-hover)]"
+              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg text-[var(--ink-muted)] hover:bg-[var(--surface-hover)]"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -619,17 +621,20 @@ export default function App() {
   // Apply Light/Dark Color Theme to <html> (AccessibilityProvider manages all 9 a11y data-* attributes)
   useEffect(() => {
     const root = document.documentElement;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const mq =
+      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-color-scheme: dark)')
+        : null;
 
     const applyTheme = () => {
       const shouldBeDark =
-        settings.theme === 'dark' || (settings.theme === 'system' && mq.matches);
+        settings.theme === 'dark' || (settings.theme === 'system' && Boolean(mq?.matches));
       root.classList.toggle('dark', shouldBeDark);
     };
 
     applyTheme();
-    mq.addEventListener('change', applyTheme);
-    return () => mq.removeEventListener('change', applyTheme);
+    mq?.addEventListener('change', applyTheme);
+    return () => mq?.removeEventListener('change', applyTheme);
   }, [settings.theme]);
 
   // Unified effective settings merging app state with centralized AccessibilityProvider
@@ -1275,10 +1280,18 @@ export default function App() {
   }, []);
   const handleOpenTherapistSummary = useCallback(() => {
     setQuickSheetOpen(false);
+    setSettingsTab(null);
+    setHandoffNoteOpen(false);
     setTherapistModalOpen(true);
+  }, []);
+  const handleOpenSettingsTab = useCallback((tab: SettingsTabId) => {
+    setQuickSheetOpen(false);
+    setHandoffNoteOpen(false);
+    setSettingsTab(tab);
   }, []);
   const handleOpenWearableSettings = useCallback(() => {
     setQuickSheetOpen(false);
+    setHandoffNoteOpen(false);
     setSettingsTab('wearables');
   }, []);
   const handleUpdateSettings = useCallback(
@@ -1306,8 +1319,18 @@ export default function App() {
   }, [handleLaunchBreathingReset]);
   const handleCloseSettings = useCallback(() => setSettingsTab(null), []);
 
+  const isFullScreenModalOpen =
+    nudgesModalOpen ||
+    therapistModalOpen ||
+    commandOpen ||
+    panicAnchorOpen ||
+    handoffNoteOpen ||
+    Boolean(routineBuilderTarget) ||
+    Boolean(activePlayer);
+
   const isTopOverlayMounted =
-    Boolean(settingsTab) || settingsDrawerMounted || quickSheetOpen || quickSheetMounted;
+    !isFullScreenModalOpen &&
+    (Boolean(settingsTab) || settingsDrawerMounted || quickSheetOpen || quickSheetMounted);
 
   return (
     <div
@@ -1423,7 +1446,9 @@ export default function App() {
         >
           {/* Kept-Mounted Tab Panels for Zero-Flash Switching (Hidden tabs are inert & non-interactive) */}
           <div
+            id="tabpanel-today"
             role="tabpanel"
+            aria-labelledby="capsule-tab-today"
             aria-label="Today"
             hidden={activeTab !== 'today'}
             inert={activeTab !== 'today'}
@@ -1449,7 +1474,9 @@ export default function App() {
 
           {mountedTabs.routines && (
             <div
+              id="tabpanel-routines"
               role="tabpanel"
+              aria-labelledby="capsule-tab-routines"
               aria-label="Routines"
               hidden={activeTab !== 'routines'}
               inert={activeTab !== 'routines'}
@@ -1479,7 +1506,9 @@ export default function App() {
 
           {mountedTabs.log && (
             <div
+              id="tabpanel-log"
               role="tabpanel"
+              aria-labelledby="capsule-tab-log"
               aria-label="Mood Log"
               hidden={activeTab !== 'log'}
               inert={activeTab !== 'log'}
@@ -1503,7 +1532,9 @@ export default function App() {
 
           {mountedTabs.trends && analytics && (
             <div
+              id="tabpanel-trends"
               role="tabpanel"
+              aria-labelledby="capsule-tab-trends"
               aria-label="Trends"
               hidden={activeTab !== 'trends'}
               inert={activeTab !== 'trends'}
@@ -1528,7 +1559,9 @@ export default function App() {
 
           {mountedTabs.coach && analytics7D && (
             <div
+              id="tabpanel-coach"
               role="tabpanel"
+              aria-labelledby="capsule-tab-coach"
               aria-label="Coach"
               hidden={activeTab !== 'coach'}
               inert={activeTab !== 'coach'}
@@ -1686,6 +1719,9 @@ export default function App() {
             aria-modal="true"
             aria-labelledby="phone-handoff-title"
             tabIndex={-1}
+            style={{
+              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1.25rem)',
+            }}
             className="wb-surface w-full max-w-md space-y-4 rounded-t-3xl p-5 focus:outline-none sm:rounded-3xl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -1766,8 +1802,8 @@ export default function App() {
             onQuickLogEmotion={handleCommandQuickLog}
             onLaunchProtocol={handleLaunchProtocol}
             onLaunchPanicAnchor={handleLaunchPanicAnchor}
-            onOpenTherapistSummary={() => setTherapistModalOpen(true)}
-            onOpenSettingsTab={(tab) => setSettingsTab(tab)}
+            onOpenTherapistSummary={handleOpenTherapistSummary}
+            onOpenSettingsTab={handleOpenSettingsTab}
           />
         </Suspense>
       )}

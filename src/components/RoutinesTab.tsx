@@ -231,7 +231,7 @@ export const RoutinesTab: React.FC<RoutinesTabProps> = React.memo(
     const routineStartStaggerIdx = controlsStaggerIdx + 1;
 
     return (
-      <div className="wb-routines-root wb-calm-stack space-y-6 pb-[104px] sm:pb-[112px] lg:space-y-8">
+      <div className="wb-routines-root wb-calm-stack space-y-6 pb-[var(--page-bottom-clearance)] lg:space-y-8">
         {/* Header + New Routine CTA */}
         <section className="flex flex-wrap items-end justify-between gap-4">
           <div>

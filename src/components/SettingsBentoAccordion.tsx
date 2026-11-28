@@ -68,6 +68,7 @@ export const SettingsBentoAccordion: React.FC<SettingsBentoAccordionProps> = ({
       const prefersReduced =
         a11y.reduceMotion ||
         (typeof window !== 'undefined' &&
+          typeof window.matchMedia === 'function' &&
           window.matchMedia('(prefers-reduced-motion: reduce)').matches);
       const behavior: ScrollBehavior = prefersReduced ? 'auto' : 'smooth';
       const timer = window.setTimeout(

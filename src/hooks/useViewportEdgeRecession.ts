@@ -50,7 +50,10 @@ function isReduceMotionActive(settingReduceMotion: boolean): boolean {
   if (attr === 'false') return false;
   if (html.classList.contains('reduce-motion')) return true;
   if (html.classList.contains('allow-motion')) return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return (
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
 }
 
 function parsePx(value: string, fallback: number): number {
@@ -356,9 +359,12 @@ export function useViewportEdgeRecession(
       scheduleFrame();
     };
 
-    const motionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const motionMq =
+      typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
     const onMotionPrefChange = () => scheduleFullRecalc();
-    motionMq.addEventListener('change', onMotionPrefChange);
+    motionMq?.addEventListener('change', onMotionPrefChange);
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize, { passive: true });
@@ -410,7 +416,7 @@ export function useViewportEdgeRecession(
       if (rafId !== null) window.cancelAnimationFrame(rafId);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
-      motionMq.removeEventListener('change', onMotionPrefChange);
+      motionMq?.removeEventListener('change', onMotionPrefChange);
       resizeObserver.disconnect();
       mutationObserver.disconnect();
       rootAttrObserver.disconnect();

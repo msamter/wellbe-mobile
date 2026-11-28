@@ -144,6 +144,7 @@ export const WearablesTab: React.FC<WearablesTabProps> = ({
     const reduced =
       a11y.reduceMotion ||
       (typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
     if (jumpTimerRef.current !== null) {

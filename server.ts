@@ -10,7 +10,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 function getGeminiClient(apiVersion?: string): GoogleGenAI | null {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -58,11 +58,19 @@ function fmtNum(val: unknown, digits = 1, fallback = 'N/A'): string {
   return typeof val === 'number' && Number.isFinite(val) ? val.toFixed(digits) : fallback;
 }
 
+function safeText(val: unknown, maxLen: number, fallback: string): string {
+  if (typeof val !== 'string') return fallback;
+  const cleaned = val.replace(/\s+/g, ' ').trim();
+  return cleaned ? cleaned.slice(0, maxLen) : fallback;
+}
+
 async function startServer() {
   const app = express();
+  app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
 
   app.post('/api/coach', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
     try {
       const body = req.body as CoachRequestBody;
       const sanitizedMessages = Array.isArray(body?.messages)
@@ -92,31 +100,44 @@ async function startServer() {
       }
 
       const ctx = body.contextSummary;
+      const rangeLabel = safeText(ctx?.rangeLabel, 64, 'Last 7 days');
+      const avgState = safeText(ctx?.avgState, 64, 'Steady');
+      const burnoutZone = safeText(ctx?.burnoutZone, 64, 'Balanced');
+      const topDriver = safeText(ctx?.topDriver, 80, 'No tags yet');
+
       const recentList = (Array.isArray(ctx?.recentEntries) ? ctx.recentEntries : [])
         .slice(0, 8)
         .map((e) => {
           const scoreStr = fmtNum(e?.score, 1, '—');
-          const tagsStr = Array.isArray(e?.tags) && e.tags.length > 0 ? e.tags.join(', ') : 'No tags';
-          const noteStr = typeof e?.note === 'string' && e.note.trim() ? ` — "${e.note.trim()}"` : '';
-          return `- ${e?.date ?? 'Unknown'}: ${e?.emotion ?? 'Check-in'} (${scoreStr}/5.0) [${tagsStr}]${noteStr} (${e?.source ?? 'manual'})`;
+          const tagsStr =
+            Array.isArray(e?.tags) && e.tags.length > 0
+              ? e.tags
+                  .slice(0, 8)
+                  .map((t) => safeText(t, 32, ''))
+                  .filter(Boolean)
+                  .join(', ') || 'No tags'
+              : 'No tags';
+          const cleanedNote = safeText(e?.note, 280, '');
+          const noteStr = cleanedNote ? ` — "${cleanedNote}"` : '';
+          return `- ${safeText(e?.date, 32, 'Unknown')}: ${safeText(e?.emotion, 48, 'Check-in')} (${scoreStr}/5.0) [${tagsStr}]${noteStr} (${safeText(e?.source, 24, 'manual')})`;
         })
         .join('\n');
 
       const avgScoreText =
         typeof ctx?.avgScore === 'number' && Number.isFinite(ctx.avgScore) && (ctx?.totalLogged ?? 0) > 0
-          ? `${ctx.avgScore.toFixed(1)}/5.0 (${ctx?.avgState ?? 'Steady'})`
+          ? `${ctx.avgScore.toFixed(1)}/5.0 (${avgState})`
           : 'No check-ins logged yet';
 
       const systemInstruction = `You are WELLBE+ Coach, a calm, evidence-informed emotional well-being and somatic regulation companion.
 Your tone is warm, grounded, concise, adult-oriented, and non-clinical (you are a supportive wellness coach, not a diagnosing doctor).
 
-USER'S LIVE TELEMETRY & LOGGED DATA (${ctx?.rangeLabel ?? 'Last 7 days'}):
-- Total check-ins logged: ${ctx?.totalLogged ?? 0}
-- Active check-in streak: ${ctx?.streakDays ?? 0} days
+USER'S LIVE TELEMETRY & LOGGED DATA (${rangeLabel}):
+- Total check-ins logged: ${fmtNum(ctx?.totalLogged, 0, '0')}
+- Active check-in streak: ${fmtNum(ctx?.streakDays, 0, '0')} days
 - 7-Day Mood Average: ${avgScoreText}
-- Burnout Resilience Index: ${fmtNum(ctx?.burnoutScore, 0)}/100 (${ctx?.burnoutZone ?? 'Balanced'})
+- Burnout Resilience Index: ${fmtNum(ctx?.burnoutScore, 0)}/100 (${burnoutZone})
 - Pixel Watch Biometrics (7-day avg): Sleep ${fmtNum(ctx?.avgSleepHours, 1)}h (quality ${fmtNum(ctx?.avgSleepQuality, 0)}/100), Est. HRV ${fmtNum(ctx?.avgHrv, 0)} ms, Resting HR ${fmtNum(ctx?.avgRestingHr, 0)} bpm
-- Top Uplifting Driver: ${ctx?.topDriver ?? 'No tags yet'}
+- Top Uplifting Driver: ${topDriver}
 
 RECENT MOOD CHECK-INS:
 ${recentList || '- No recent entries logged yet.'}
@@ -155,16 +176,14 @@ GUIDELINES:
       res.json({
         reply,
         citations: [
-          `${ctx?.rangeLabel ?? '7-day window'} · ${avgCitation}`,
+          `${safeText(ctx?.rangeLabel, 64, '7-day window')} · ${avgCitation}`,
           `Sleep ${fmtNum(ctx?.avgSleepHours, 1, '—')}h · HRV ${fmtNum(ctx?.avgHrv, 0, '—')} ms`,
           `Burnout index ${fmtNum(ctx?.burnoutScore, 0, '—')}/100`,
         ],
       });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Unable to reach WELLBE+ Coach right now.';
       console.error('WELLBE+ Coach error:', err);
-      res.status(500).json({ error: message });
+      res.status(500).json({ error: 'Unable to reach WELLBE+ Coach right now. Please try again.' });
     }
   });
 
@@ -253,10 +272,8 @@ GUIDELINES:
 
       res.json(payload);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Unable to generate voiceover audio right now.';
       console.error('WELLBE+ TTS error:', err);
-      res.status(500).json({ error: message });
+      res.status(500).json({ error: 'Unable to generate voiceover audio right now.' });
     }
   });
 

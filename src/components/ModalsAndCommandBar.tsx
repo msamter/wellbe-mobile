@@ -591,7 +591,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
                           type="button"
                           onClick={() => adjustStepDuration(idx, -1)}
                           aria-label={`Decrease duration for step ${idx + 1}`}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border-hairline)] bg-[var(--surface-card)] font-semibold text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
+                          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--border-hairline)] bg-[var(--surface-card)] font-semibold text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
                         >
                           −
                         </button>
@@ -602,7 +602,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
                           type="button"
                           onClick={() => adjustStepDuration(idx, 1)}
                           aria-label={`Increase duration for step ${idx + 1}`}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border-hairline)] bg-[var(--surface-card)] font-semibold text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
+                          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--border-hairline)] bg-[var(--surface-card)] font-semibold text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
                         >
                           +
                         </button>
@@ -610,9 +610,9 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({
                           type="button"
                           onClick={() => removeStep(idx)}
                           aria-label={`Remove step ${idx + 1}`}
-                          className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded-lg text-[var(--q-red-fg)] hover:bg-[var(--q-red-bg)]"
+                          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg text-[var(--q-red-fg)] hover:bg-[var(--q-red-bg)]"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="h-4 w-4" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -1114,6 +1114,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   ]);
 
   const safeActiveIdx = Math.min(activeIndex, Math.max(0, actions.length - 1));
+  const activeOptionId = actions[safeActiveIdx]
+    ? `command-option-${actions[safeActiveIdx].id}`
+    : undefined;
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  useEffect(() => {
+    const el = optionRefs.current[safeActiveIdx];
+    el?.scrollIntoView({ block: 'nearest' });
+  }, [safeActiveIdx, actions.length]);
 
   const handleInputKeyDown = (e: React.KeyboardEvent) => {
     if (actions.length === 0) return;
@@ -1148,8 +1157,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         className="liquid-glass-strong flex max-h-[78dvh] w-full max-w-lg flex-col overflow-hidden rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex shrink-0 items-center gap-2.5 border-b border-[var(--border-hairline)] px-4 py-3">
-          <Search className="h-4 w-4 shrink-0 text-[var(--ink-muted)]" />
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-[var(--border-hairline)] px-4 py-2.5 focus-within:ring-2 focus-within:ring-inset focus-within:ring-[var(--focus-ring)]">
+          <Search className="h-4 w-4 shrink-0 text-[var(--ink-muted)]" aria-hidden="true" />
           <label htmlFor="command-bar-input" className="sr-only">
             Search commands, emotions, and somatic protocols
           </label>
@@ -1157,6 +1166,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             id="command-bar-input"
             data-autofocus="true"
             type="text"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="command-bar-listbox"
+            aria-autocomplete="list"
+            aria-activedescendant={activeOptionId}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -1164,19 +1178,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             }}
             onKeyDown={handleInputKeyDown}
             placeholder="Log an emotion, start 4-7-8 breathing, open Therapist Summary…"
-            className="min-h-[36px] min-w-0 flex-1 bg-transparent text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-muted)] focus:outline-none"
+            className="min-h-[44px] min-w-0 flex-1 bg-transparent text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-muted)] focus:outline-none"
           />
           <button
             type="button"
             onClick={onClose}
             aria-label="Close command bar"
-            className="min-h-[36px] shrink-0 rounded-lg px-2.5 font-mono-tabular text-xs text-[var(--ink-muted)] hover:bg-[var(--surface-hover)]"
+            className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg px-2.5 font-mono-tabular text-xs text-[var(--ink-muted)] hover:bg-[var(--surface-hover)]"
           >
             Esc
           </button>
         </div>
 
         <div
+          id="command-bar-listbox"
           ref={listRef}
           role="listbox"
           aria-label="Command results"
@@ -1192,6 +1207,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               return (
                 <button
                   key={item.id}
+                  id={`command-option-${item.id}`}
+                  ref={(el) => {
+                    optionRefs.current[idx] = el;
+                  }}
                   type="button"
                   role="option"
                   aria-selected={highlighted}

@@ -189,7 +189,7 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
     return (
       <motion.nav
         aria-label="Primary navigation"
-        aria-hidden={locked || !isVisible || undefined}
+        aria-hidden={locked || undefined}
         data-locked={locked ? 'true' : 'false'}
         data-visible={isVisible ? 'true' : 'false'}
         data-no-drag-scroll="true"
@@ -222,16 +222,18 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
                 return (
                   <motion.button
                     key={tab.id}
+                    id={`capsule-tab-${tab.id}`}
                     ref={(el) => {
                       tabRefs.current[idx] = el;
                     }}
                     type="button"
                     role="tab"
                     aria-selected={isActive}
+                    aria-controls={`tabpanel-${tab.id}`}
                     aria-current={isActive ? 'page' : undefined}
                     aria-label={isActive ? undefined : accessibleName}
                     title={isActive ? undefined : accessibleName}
-                    tabIndex={locked || !isVisible ? -1 : isActive ? 0 : -1}
+                    tabIndex={locked ? -1 : isActive ? 0 : -1}
                     aria-disabled={locked || undefined}
                     data-active={isActive ? 'true' : 'false'}
                     onClick={() => {
@@ -280,7 +282,7 @@ export const ExpandingCapsuleDock: React.FC<ExpandingCapsuleDockProps> = React.m
         <motion.button
           type="button"
           aria-disabled={locked || undefined}
-          tabIndex={locked || !isVisible ? -1 : 0}
+          tabIndex={locked ? -1 : 0}
           data-open={quickCheckInOpen ? 'true' : 'false'}
           onClick={() => {
             if (locked) return;

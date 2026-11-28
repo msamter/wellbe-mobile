@@ -649,7 +649,7 @@ export const ProtocolPlayerModal: React.FC<ProtocolPlayerProps> = ({
                 }}
                 aria-pressed={effectiveVoiceOn}
                 aria-label={effectiveVoiceOn ? 'Turn voice guide off' : 'Turn gentle voice guide on'}
-                className="inline-flex min-h-[40px] items-center gap-1.5 whitespace-nowrap rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-card)] px-2.5 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
+                className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-card)] px-3 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
               >
                 {effectiveVoiceOn ? (
                   <Volume2 className="h-3.5 w-3.5 text-[var(--bio-mint)]" />
@@ -701,7 +701,7 @@ export const ProtocolPlayerModal: React.FC<ProtocolPlayerProps> = ({
                     return next;
                   });
                 }}
-                className="min-h-[36px] rounded-lg border border-[var(--border-hairline)] bg-[var(--surface-card)] px-2.5 text-xs font-semibold text-[var(--accent-primary)] hover:bg-[var(--surface-hover)]"
+                className="min-h-[44px] rounded-lg border border-[var(--border-hairline)] bg-[var(--surface-card)] px-3 text-xs font-semibold text-[var(--accent-primary)] hover:bg-[var(--surface-hover)]"
               >
                 {effectiveQuiet ? 'Unmute for this session' : 'Return to quiet mode'}
               </button>

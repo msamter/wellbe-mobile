@@ -879,7 +879,7 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
     };
 
     return (
-      <div className="space-y-3.5 pb-[104px] sm:pb-[112px]">
+      <div className="space-y-3.5 pb-[var(--page-bottom-clearance)]">
         {/* Polite Screen-Reader Status for Inline 3s Undo */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {liveAnnouncement}
@@ -887,7 +887,7 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
 
         {/* Header Row: Mood Log Title on top, Check-in Count Subheader underneath, Export & Data on right */}
         <section className="space-y-2.5">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
             <div className="min-w-0">
               <h1
                 className="text-xl font-semibold tracking-tight text-[var(--ink-primary)] sm:text-2xl"
@@ -931,7 +931,7 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
                     type="button"
                     role="menuitem"
                     onClick={handleExportJson}
-                    className="flex min-h-[40px] w-full items-center gap-2.5 rounded-xl px-3 text-left text-xs font-medium text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
+                    className="flex min-h-[44px] w-full items-center gap-2.5 rounded-xl px-3 text-left text-xs font-medium text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
                   >
                     <FileJson className="h-4 w-4 shrink-0 text-[var(--ink-muted)]" />
                     <span>Export Journal as JSON</span>
@@ -940,7 +940,7 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
                     type="button"
                     role="menuitem"
                     onClick={handleExportCsv}
-                    className="flex min-h-[40px] w-full items-center gap-2.5 rounded-xl px-3 text-left text-xs font-medium text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
+                    className="flex min-h-[44px] w-full items-center gap-2.5 rounded-xl px-3 text-left text-xs font-medium text-[var(--ink-primary)] hover:bg-[var(--surface-hover)]"
                   >
                     <FileSpreadsheet className="h-4 w-4 shrink-0 text-[var(--ink-muted)]" />
                     <span>Export Journal as CSV</span>
@@ -990,14 +990,14 @@ export const LogTab: React.FC<LogTabProps> = React.memo(
                               backgroundColor: 'var(--q-red-solid)',
                               color: 'var(--q-red-ink)',
                             }}
-                            className="min-h-[36px] flex-1 rounded-lg text-[11px] font-semibold"
+                            className="min-h-[44px] flex-1 rounded-lg text-[11px] font-semibold"
                           >
                             Confirm Clear
                           </button>
                           <button
                             type="button"
                             onClick={() => setConfirmClear(false)}
-                            className="min-h-[36px] rounded-lg bg-[var(--surface-card)] px-3 text-[11px] font-medium text-[var(--ink-primary)]"
+                            className="min-h-[44px] rounded-lg bg-[var(--surface-card)] px-3 text-[11px] font-medium text-[var(--ink-primary)]"
                           >
                             Cancel
                           </button>

@@ -103,6 +103,7 @@ export const HelpSupportTab: React.FC<HelpSupportTabProps> = ({
     const reduced =
       a11y.reduceMotion ||
       (typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if (scrollTimerRef.current !== null) window.clearTimeout(scrollTimerRef.current);
     scrollTimerRef.current = window.setTimeout(
@@ -123,6 +124,9 @@ export const HelpSupportTab: React.FC<HelpSupportTabProps> = ({
   const handleCopyReportContext = async () => {
     const text = `Feedback Contact: ${FEEDBACK_EMAIL}\n${diagnosticContext}`;
     try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard API unavailable');
+      }
       await navigator.clipboard.writeText(text);
       setCopiedContext(true);
       onAnnounce('Feedback email and app diagnostics copied to clipboard.');
@@ -313,9 +317,11 @@ export const HelpSupportTab: React.FC<HelpSupportTabProps> = ({
                       href="https://www.nami.org/help"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold text-[var(--brand-accent-text)] underline underline-offset-2"
+                      data-no-drag-scroll="true"
+                      className="inline-flex items-center gap-0.5 font-semibold text-[var(--brand-accent-text)] underline underline-offset-2"
                     >
-                      nami.org/help
+                      <span>nami.org/help</span>
+                      <ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
                       <span className="sr-only"> (Opens in a new tab)</span>
                     </a>
                   </p>

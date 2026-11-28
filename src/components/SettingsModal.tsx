@@ -88,7 +88,10 @@ function isSettingsReduceMotion(pref: boolean): boolean {
   const attr = document.documentElement.getAttribute('data-reduce-motion');
   if (attr === 'true') return true;
   if (attr === 'false') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return (
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
 }
 
 function getCurrentTranslateY(el: HTMLElement | null): number {

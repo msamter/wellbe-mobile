@@ -79,7 +79,10 @@ function isReduceMotionActive(settingReduceMotion: boolean): boolean {
   if (attr === 'false') return false;
   if (html.classList.contains('reduce-motion')) return true;
   if (html.classList.contains('allow-motion')) return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return (
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
 }
 
 function getDocumentScroller(): HTMLElement {

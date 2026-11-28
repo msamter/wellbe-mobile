@@ -57,43 +57,43 @@ export function getEmotionPersonalGlow(
   switch (emotionId) {
     // Yellow Quadrant — Warm golden-amber spectrum
     case 'ecstatic':
-      return 'color-mix(in srgb, var(--q-yellow-solid) 82%, #FFE57F)';
+      return 'var(--glow-ecstatic)';
     case 'joyful':
       return 'var(--q-yellow-solid)';
     case 'energized':
-      return 'color-mix(in srgb, var(--q-yellow-solid) 86%, #FF9E40)';
+      return 'var(--glow-energized)';
     case 'inspired':
-      return 'color-mix(in srgb, var(--q-yellow-solid) 88%, #FFF0A6)';
+      return 'var(--glow-inspired)';
 
     // Green Quadrant — Soft sage-emerald / mint spectrum
     case 'grateful':
-      return 'color-mix(in srgb, var(--q-green-solid) 84%, #8EE5B8)';
+      return 'var(--glow-grateful)';
     case 'calm':
       return 'var(--q-green-solid)';
     case 'content':
-      return 'color-mix(in srgb, var(--q-green-solid) 86%, #B4E6CE)';
+      return 'var(--glow-content)';
     case 'rested':
-      return 'color-mix(in srgb, var(--q-green-solid) 88%, #5EA88A)';
+      return 'var(--glow-rested)';
 
     // Blue Quadrant — Deep slate-cobalt / serene blue spectrum
     case 'tired':
-      return 'color-mix(in srgb, var(--q-blue-solid) 84%, #9DB8D6)';
+      return 'var(--glow-tired)';
     case 'drained':
-      return 'color-mix(in srgb, var(--q-blue-solid) 88%, #2E4B73)';
+      return 'var(--glow-drained)';
     case 'sad':
       return 'var(--q-blue-solid)';
     case 'lonely':
-      return 'color-mix(in srgb, var(--q-blue-solid) 85%, #6F7FB8)';
+      return 'var(--glow-lonely)';
 
     // Red Quadrant — Warm terracotta-coral / muted crimson spectrum
     case 'anxious':
-      return 'color-mix(in srgb, var(--q-red-solid) 84%, #F29C7E)';
+      return 'var(--glow-anxious)';
     case 'stressed':
       return 'var(--q-red-solid)';
     case 'frustrated':
-      return 'color-mix(in srgb, var(--q-red-solid) 88%, #D45D3A)';
+      return 'var(--glow-frustrated)';
     case 'overwhelmed':
-      return 'color-mix(in srgb, var(--q-red-solid) 86%, #8C2D2B)';
+      return 'var(--glow-overwhelmed)';
 
     default:
       if (quadrant === 'yellow') return 'var(--q-yellow-solid)';
@@ -300,7 +300,7 @@ export const CompactEmotionButton: React.FC<CompactEmotionButtonProps> = React.m
             style={{
               backgroundColor: isActive ? qStyle.solid : 'var(--surface-card)',
               backgroundImage: isActive
-                ? `linear-gradient(180deg, color-mix(in srgb, ${personalGlow} 26%, rgba(255, 255, 255, 0.22)) 0%, rgba(255, 255, 255, 0) 100%)`
+                ? `linear-gradient(180deg, color-mix(in srgb, ${personalGlow} 26%, color-mix(in srgb, var(--palette-near-white) 22%, transparent)) 0%, transparent 100%)`
                 : `linear-gradient(${qStyle.bg}, ${qStyle.bg})`,
             }}
           />
@@ -320,7 +320,7 @@ export const CompactEmotionButton: React.FC<CompactEmotionButtonProps> = React.m
                 className="absolute inset-0 m-auto aspect-square w-full rounded-full"
                 style={{
                   background: isActive
-                    ? `radial-gradient(circle, rgba(255, 255, 255, 0.52) 0%, color-mix(in srgb, ${personalGlow} 40%, transparent) 55%, transparent 75%)`
+                    ? `radial-gradient(circle, color-mix(in srgb, var(--palette-near-white) 52%, transparent) 0%, color-mix(in srgb, ${personalGlow} 40%, transparent) 55%, transparent 75%)`
                     : `radial-gradient(circle, color-mix(in srgb, ${personalGlow} 58%, transparent) 0%, transparent 72%)`,
                 }}
               />

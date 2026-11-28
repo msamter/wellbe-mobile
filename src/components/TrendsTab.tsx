@@ -310,7 +310,7 @@ export const TrendsTab: React.FC<TrendsTabProps> = React.memo(
     return (
       <div
         ref={trendsRootRef}
-        className="wb-trends-root wb-calm-stack space-y-6 pb-[104px] sm:pb-[112px] lg:space-y-7"
+        className="wb-trends-root wb-calm-stack space-y-6 pb-[var(--page-bottom-clearance)] lg:space-y-7"
       >
         {/* Header & Controls: Expressive Display Title + Therapist Summary + 7D/30D Toggle */}
         <section className="flex flex-wrap items-end justify-between gap-4">

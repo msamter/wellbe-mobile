@@ -244,7 +244,7 @@ const CoachTelemetrySidebar: React.FC<CoachTelemetrySidebarProps> = React.memo(
           <button
             type="button"
             onClick={() => onLaunchProtocol(BREATHING_PROTOCOL)}
-            className="flex min-h-[38px] w-full items-center justify-between rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
+            className="flex min-h-[44px] w-full items-center justify-between rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
           >
             <span className="flex items-center gap-2">
               <Wind className="h-3.5 w-3.5 text-[var(--accent-primary)]" />
@@ -255,7 +255,7 @@ const CoachTelemetrySidebar: React.FC<CoachTelemetrySidebarProps> = React.memo(
           <button
             type="button"
             onClick={() => onLaunchProtocol(GROUNDING_PROTOCOL)}
-            className="flex min-h-[38px] w-full items-center justify-between rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
+            className="flex min-h-[44px] w-full items-center justify-between rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
           >
             <span>Mindful Grounding Scan</span>
             <span className="text-[var(--ink-muted)]">Launch</span>
@@ -263,7 +263,7 @@ const CoachTelemetrySidebar: React.FC<CoachTelemetrySidebarProps> = React.memo(
           <button
             type="button"
             onClick={onOpenTherapistSummary}
-            className="flex min-h-[38px] w-full items-center justify-between rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
+            className="flex min-h-[44px] w-full items-center justify-between rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3 text-xs font-semibold text-[var(--ink-primary)] transition-colors hover:bg-[var(--surface-hover)]"
           >
             <span>Generate Therapist Summary</span>
             <span className="text-[var(--ink-muted)]">Open</span>
@@ -463,7 +463,7 @@ export const CoachTab: React.FC<CoachTabProps> = React.memo(
     return (
       <div className="wb-coach-viewport flex min-h-0 flex-1 flex-col gap-2 overflow-hidden sm:gap-2.5">
         {/* Header: WELLBE+ Coach title on top, date range & log count subheader beneath, full-size Context button */}
-        <section className="flex shrink-0 items-center justify-between gap-3">
+        <section className="flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <div className="min-w-0">
             <h1
               className="text-2xl font-semibold tracking-tight text-[var(--ink-primary)] sm:text-[28px]"
@@ -482,7 +482,7 @@ export const CoachTab: React.FC<CoachTabProps> = React.memo(
             </p>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
             {/* Full-Size Mobile/Tablet Context Switcher */}
             <ExpressiveButton
               variant="outlined"
@@ -562,7 +562,7 @@ export const CoachTab: React.FC<CoachTabProps> = React.memo(
                           key={prompt}
                           type="button"
                           onClick={() => void sendPrompt(prompt)}
-                          className="flex min-h-[38px] w-full items-center justify-between gap-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 py-2 text-left text-xs font-medium text-[var(--ink-primary)] transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--surface-hover)] sm:min-h-[40px] sm:text-sm"
+                          className="flex min-h-[44px] w-full items-center justify-between gap-2.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 py-2 text-left text-xs font-medium text-[var(--ink-primary)] transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--surface-hover)] sm:text-sm"
                         >
                           <span>{prompt}</span>
                           <Send className="h-3.5 w-3.5 shrink-0 text-[var(--ink-muted)]" />
@@ -656,7 +656,7 @@ export const CoachTab: React.FC<CoachTabProps> = React.memo(
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isSending}
                 placeholder="Ask about moods, sleep, or a quick reset..."
-                className="min-h-[42px] min-w-0 flex-1 rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-muted)]"
+                className="min-h-[44px] min-w-0 flex-1 rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-subtle)] px-3.5 text-sm text-[var(--ink-primary)] placeholder:text-[var(--ink-muted)]"
               />
               <ExpressiveButton
                 type="submit"
